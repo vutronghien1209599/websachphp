@@ -44,7 +44,13 @@ class BookController extends Controller
 
     public function show(Book $book)
     {
-        return view('books.show', compact('book'));
+        // Lấy các sách liên quan cùng thể loại
+        $relatedBooks = Book::where('category', $book->category)
+            ->where('id', '!=', $book->id)
+            ->take(4)
+            ->get();
+
+        return view('books.show', compact('book', 'relatedBooks'));
     }
 
     public function category($category)

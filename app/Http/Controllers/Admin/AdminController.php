@@ -22,12 +22,12 @@ class AdminController extends Controller
                             ->take(5)
                             ->get();
 
-        $topBooks = Book::withCount(['orderDetails as total_sold' => function($query) {
+        $topBooks = Book::withCount(['orderItems as total_sold' => function($query) {
                         $query->whereHas('order', function($q) {
                             $q->where('status', 'completed');
                         });
                     }])
-                    ->withSum(['orderDetails as revenue' => function($query) {
+                    ->withSum(['orderItems as revenue' => function($query) {
                         $query->whereHas('order', function($q) {
                             $q->where('status', 'completed');
                         });

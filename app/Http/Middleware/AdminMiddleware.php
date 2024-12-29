@@ -9,8 +9,8 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
-            return redirect()->route('home')->with('error', 'Bạn không có quyền truy cập trang này.');
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
         }
 
         return $next($request);

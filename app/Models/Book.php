@@ -20,8 +20,8 @@ class Book extends Model
         'status'
     ];
 
-    public function orderDetails()
+    public function orderItems()
     {
-        return $this->hasMany(OrderDetail::class);
+        return $this->hasMany(OrderItem::class);
     }
 } 
