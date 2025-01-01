@@ -138,17 +138,17 @@
                             <i class="bi bi-grid"></i> Danh mục
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('books.index') }}?category=fiction">
+                            <li><a class="dropdown-item" href="{{ route('books.index') }}?category=Văn học">
                                 <i class="bi bi-book"></i> Sách văn học
                             </a></li>
-                            <li><a class="dropdown-item" href="{{ route('books.index') }}?category=education">
+                            <li><a class="dropdown-item" href="{{ route('books.index') }}?category=Giáo khoa">
                                 <i class="bi bi-journal-text"></i> Sách giáo khoa
                             </a></li>
-                            <li><a class="dropdown-item" href="{{ route('books.index') }}?category=children">
+                            <li><a class="dropdown-item" href="{{ route('books.index') }}?category=Thiếu nhi">
                                 <i class="bi bi-emoji-smile"></i> Sách thiếu nhi
                             </a></li>
-                            <li><a class="dropdown-item" href="{{ route('books.index') }}?category=foreign">
-                                <i class="bi bi-translate"></i> Sách ngoại ngữ
+                            <li><a class="dropdown-item" href="{{ route('books.index') }}?category=Kinh tế">
+                                <i class="bi bi-translate"></i> Sách kinh tế
                             </a></li>
                         </ul>
                     </li>

@@ -30,7 +30,7 @@
         </div>
         <div class="row g-4">
             <div class="col-6 col-md-3">
-                <a href="{{ route('books.index', ['category' => 'fiction']) }}" class="text-decoration-none">
+                <a href="{{ route('books.index', ['category' => 'Văn học']) }}" class="text-decoration-none">
                     <div class="category-card text-center p-4 rounded shadow-sm">
                         <i class="bi bi-book-half text-primary fs-1 mb-3 d-block"></i>
                         <h5 class="mb-2">Văn học</h5>
@@ -39,7 +39,7 @@
                 </a>
             </div>
             <div class="col-6 col-md-3">
-                <a href="{{ route('books.index', ['category' => 'education']) }}" class="text-decoration-none">
+                <a href="{{ route('books.index', ['category' => 'Giáo khoa']) }}" class="text-decoration-none">
                     <div class="category-card text-center p-4 rounded shadow-sm">
                         <i class="bi bi-journal-text text-success fs-1 mb-3 d-block"></i>
                         <h5 class="mb-2">Giáo khoa</h5>
@@ -48,7 +48,7 @@
                 </a>
             </div>
             <div class="col-6 col-md-3">
-                <a href="{{ route('books.index', ['category' => 'children']) }}" class="text-decoration-none">
+                <a href="{{ route('books.index', ['category' => 'Thiếu nhi']) }}" class="text-decoration-none">
                     <div class="category-card text-center p-4 rounded shadow-sm">
                         <i class="bi bi-emoji-smile text-warning fs-1 mb-3 d-block"></i>
                         <h5 class="mb-2">Thiếu nhi</h5>
@@ -57,11 +57,11 @@
                 </a>
             </div>
             <div class="col-6 col-md-3">
-                <a href="{{ route('books.index', ['category' => 'foreign']) }}" class="text-decoration-none">
+                <a href="{{ route('books.index', ['category' => 'Kinh tế']) }}" class="text-decoration-none">
                     <div class="category-card text-center p-4 rounded shadow-sm">
                         <i class="bi bi-translate text-info fs-1 mb-3 d-block"></i>
-                        <h5 class="mb-2">Ngoại ngữ</h5>
-                        <p class="text-muted small mb-0">Sách học ngoại ngữ</p>
+                        <h5 class="mb-2">Kinh tế</h5>
+                        <p class="text-muted small mb-0">Sách học Kinh tế</p>
                     </div>
                 </a>
             </div>
