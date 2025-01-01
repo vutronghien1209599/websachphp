@@ -13,15 +13,42 @@ class Book extends Model
         'title',
         'author',
         'description',
-        'category',
+        'category_id',
         'price',
-        'stock',
+        'quantity',
         'image',
         'status'
     ];
 
+    protected $casts = [
+        'price' => 'decimal:0',
+        'quantity' => 'integer'
+    ];
+
+    protected $appends = ['is_available'];
+
+    public function getIsAvailableAttribute()
+    {
+        return $this->quantity > 0;
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function wishlistItems()
+    {
+        return $this->hasMany(WishlistItem::class);
     }
 } 

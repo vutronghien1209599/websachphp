@@ -117,6 +117,18 @@
                                 <i class="bi bi-people"></i> Quản lý người dùng
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.categories.index') }}">
+                                <i class="fas fa-fw fa-list"></i>
+                                <span>Quản lý danh mục</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.discounts.index') }}">
+                                <i class="bi bi-ticket-perforated"></i>
+                                <span>Quản lý voucher</span>
+                            </a>
+                        </li>
                         <li class="nav-item mt-3">
                             <a class="nav-link" href="{{ route('home') }}" target="_blank">
                                 <i class="bi bi-shop"></i> Xem cửa hàng

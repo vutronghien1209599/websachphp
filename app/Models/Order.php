@@ -12,9 +12,18 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'total_amount',
+        'shipping_name',
+        'shipping_phone',
         'shipping_address',
-        'payment_method',
-        'status'
+        'note',
+        'status',
+        'discount_id',
+        'discount_amount',
+    ];
+
+    protected $casts = [
+        'total_amount' => 'float',
+        'discount_amount' => 'float',
     ];
 
     public function user()
@@ -25,6 +34,11 @@ class Order extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function discount()
+    {
+        return $this->belongsTo(Discount::class);
     }
 
     public function history()

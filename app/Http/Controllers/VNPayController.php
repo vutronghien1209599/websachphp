@@ -6,6 +6,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class VNPayController extends Controller
 {
@@ -20,7 +21,7 @@ class VNPayController extends Controller
         ]);
 
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_ReturnUrl = "http://localhost:8000/vnpay/return";
+        $vnp_ReturnUrl = URL::to('/vnpay/return');
         $vnp_TmnCode = "GEBGNQZC";
         $vnp_HashSecret = "391WOHKIIMQZIH348STZWJTF1I9LO974";
 
@@ -66,6 +67,9 @@ class VNPayController extends Controller
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
 
+        // Lưu thông tin vào session để kiểm tra khi VNPAY callback
+        session(['vnpay_order_id' => $order->id]);
+
         // Log URL cuối cùng để debug
         Log::info('Final VNPAY URL:', ['url' => $vnp_Url]);
 
@@ -95,19 +99,26 @@ class VNPayController extends Controller
         }
 
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
+
+        // Lấy order_id từ session
+        $orderId = session('vnpay_order_id');
+        if (!$orderId) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Không tìm thấy thông tin đơn hàng');
+        }
+
         if ($secureHash == $request->vnp_SecureHash) {
             if ($request->vnp_ResponseCode == '00') {
-                $orderId = explode('_', $request->vnp_TxnRef)[0];
                 $order = Order::findOrFail($orderId);
                 
                 // Cập nhật trạng thái đơn hàng
-                $order->update(['status' => 'confirmed']);
-                
-                // Lưu lịch sử
-                $order->history()->create([
+                $order->update([
                     'status' => 'confirmed',
                     'note' => 'Đã thanh toán qua VNPAY - Mã giao dịch: ' . $request->vnp_TransactionNo
                 ]);
+
+                // Xóa session VNPAY
+                session()->forget('vnpay_order_id');
 
                 return redirect()->route('orders.show', $order)
                     ->with('success', 'Thanh toán thành công!');

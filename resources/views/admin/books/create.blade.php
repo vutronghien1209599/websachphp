@@ -54,16 +54,16 @@
 
                         <div class="mb-3">
                             <label class="form-label">Danh mục</label>
-                            <select name="category" class="form-select @error('category') is-invalid @enderror" required>
+                            <select name="category_id" class="form-select @error('category_id') is-invalid @enderror" required>
                                 <option value="">Chọn danh mục</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category }}" 
-                                            {{ old('category') === $category ? 'selected' : '' }}>
-                                        {{ $category }}
+                                    <option value="{{ $category->id }}" 
+                                            {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('category')
+                            @error('category_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -79,9 +79,9 @@
 
                         <div class="mb-3">
                             <label class="form-label">Số lượng trong kho</label>
-                            <input type="number" name="stock" class="form-control @error('stock') is-invalid @enderror" 
-                                   value="{{ old('stock') }}" min="0" required>
-                            @error('stock')
+                            <input type="number" name="quantity" class="form-control @error('quantity') is-invalid @enderror" 
+                                   value="{{ old('quantity') }}" min="0" required>
+                            @error('quantity')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

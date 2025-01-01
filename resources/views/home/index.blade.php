@@ -10,8 +10,6 @@
             <div class="carousel-item active">
                 <img src="{{ asset('storage/images/banner2.jpg') }}" class="d-block w-100" alt="Banner 1">
                 <div class="carousel-caption">
-                    <h1 class="display-4 fw-bold mb-4">Chào mừng đến với Book Store</h1>
-                    <p class="lead mb-4">Khám phá kho tàng sách phong phú của chúng tôi</p>
                     <a href="{{ route('books.index') }}" class="btn btn-primary btn-lg">
                         <i class="bi bi-book"></i> Khám phá ngay
                     </a>
@@ -29,42 +27,17 @@
             <p class="text-muted">Khám phá các thể loại sách đa dạng</p>
         </div>
         <div class="row g-4">
+            @foreach($categories as $category)
             <div class="col-6 col-md-3">
-                <a href="{{ route('books.index', ['category' => 'Văn học']) }}" class="text-decoration-none">
+                <a href="{{ route('books.category', $category->slug) }}" class="text-decoration-none">
                     <div class="category-card text-center p-4 rounded shadow-sm">
-                        <i class="bi bi-book-half text-primary fs-1 mb-3 d-block"></i>
-                        <h5 class="mb-2">Văn học</h5>
-                        <p class="text-muted small mb-0">Tiểu thuyết, truyện ngắn</p>
+                        <i class="{{ $category->icon }} text-primary fs-1 mb-3 d-block"></i>
+                        <h5 class="mb-2">{{ $category->name }}</h5>
+                        <p class="text-muted small mb-0">{{ $category->description }}</p>
                     </div>
                 </a>
             </div>
-            <div class="col-6 col-md-3">
-                <a href="{{ route('books.index', ['category' => 'Giáo khoa']) }}" class="text-decoration-none">
-                    <div class="category-card text-center p-4 rounded shadow-sm">
-                        <i class="bi bi-journal-text text-success fs-1 mb-3 d-block"></i>
-                        <h5 class="mb-2">Giáo khoa</h5>
-                        <p class="text-muted small mb-0">Sách giáo khoa, tham khảo</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="{{ route('books.index', ['category' => 'Thiếu nhi']) }}" class="text-decoration-none">
-                    <div class="category-card text-center p-4 rounded shadow-sm">
-                        <i class="bi bi-emoji-smile text-warning fs-1 mb-3 d-block"></i>
-                        <h5 class="mb-2">Thiếu nhi</h5>
-                        <p class="text-muted small mb-0">Truyện tranh, sách thiếu nhi</p>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="{{ route('books.index', ['category' => 'Kinh tế']) }}" class="text-decoration-none">
-                    <div class="category-card text-center p-4 rounded shadow-sm">
-                        <i class="bi bi-translate text-info fs-1 mb-3 d-block"></i>
-                        <h5 class="mb-2">Kinh tế</h5>
-                        <p class="text-muted small mb-0">Sách học Kinh tế</p>
-                    </div>
-                </a>
-            </div>
+            @endforeach
         </div>
     </section>
 
@@ -91,29 +64,25 @@
                         </div>
                         @if($book->status === 'available')
                         <button class="btn btn-primary quick-add-btn" 
-                                data-add-to-cart="{{ $book->id }}">
+                                onclick="addToCart({{ $book->id }})">
                             <i class="bi bi-cart-plus"></i>
                         </button>
                         @endif
-                        <div class="book-overlay">
-                            <div class="book-actions">
-                                <button class="btn btn-light btn-sm" data-add-to-wishlist="{{ $book->id }}">
-                                    <i class="bi bi-heart"></i>
-                                </button>
-                                <a href="{{ route('books.show', $book) }}" class="btn btn-light btn-sm">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                            </div>
-                        </div>
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <span class="badge bg-primary-subtle text-primary">{{ $book->category }}</span>
-                            @if($book->status === 'available')
-                                <span class="badge bg-success-subtle text-success">Còn hàng</span>
-                            @else
-                                <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
-                            @endif
+                            <div class="book-category">
+                                <span class="badge bg-primary-subtle text-primary">
+                                    {{ $book->category->name }}
+                                </span>
+                            </div>
+                            <div class="book-status">
+                                @if($book->status === 'available')
+                                    <span class="badge bg-success-subtle text-success">Còn hàng</span>
+                                @else
+                                    <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
+                                @endif
+                            </div>
                         </div>
                         <h5 class="card-title">
                             <a href="{{ route('books.show', $book) }}" class="text-decoration-none text-dark">
@@ -127,8 +96,75 @@
                                 <div class="price text-primary fw-bold">{{ number_format($book->price) }}đ</div>
                             </div>
                             @if($book->status === 'available')
-                            <button class="btn btn-primary" data-add-to-cart="{{ $book->id }}">
-                                <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                            <button class="btn btn-primary" onclick="addToCart({{ $book->id }})">
+                                <i class="bi bi-cart-plus"></i>
+                            </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </section>
+
+    <!-- Sách bán chạy -->
+    <section class="best-sellers mb-5">
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="section-title mb-1">Sách bán chạy</h2>
+                <p class="text-muted mb-0">Những cuốn sách được yêu thích nhất</p>
+            </div>
+            <a href="{{ route('books.index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-grid"></i> Xem tất cả
+            </a>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            @foreach($bestSellers as $book)
+            <div class="col">
+                <div class="card book-card h-100 border-0 shadow-sm">
+                    <div class="position-relative">
+                        <div class="book-image">
+                            <img src="{{ asset('storage/books/'.$book->image) }}" 
+                                 class="card-img-top" 
+                                 alt="{{ $book->title }}">
+                        </div>
+                        @if($book->status === 'available')
+                        <button class="btn btn-primary quick-add-btn" 
+                                onclick="addToCart({{ $book->id }})">
+                            <i class="bi bi-cart-plus"></i>
+                        </button>
+                        @endif
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="book-category">
+                                <span class="badge bg-primary-subtle text-primary">
+                                    {{ $book->category->name }}
+                                </span>
+                            </div>
+                            <div class="book-status">
+                                @if($book->status === 'available')
+                                    <span class="badge bg-success-subtle text-success">Còn hàng</span>
+                                @else
+                                    <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
+                                @endif
+                            </div>
+                        </div>
+                        <h5 class="card-title">
+                            <a href="{{ route('books.show', $book) }}" class="text-decoration-none text-dark">
+                                {{ $book->title }}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted mb-3">{{ $book->author }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="text-muted small">Giá bán</span>
+                                <div class="price text-primary fw-bold">{{ number_format($book->price) }}đ</div>
+                            </div>
+                            @if($book->status === 'available')
+                            <button class="btn btn-primary" onclick="addToCart({{ $book->id }})">
+                                <i class="bi bi-cart-plus"></i>
                             </button>
                             @endif
                         </div>

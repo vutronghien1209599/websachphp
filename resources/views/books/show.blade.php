@@ -7,6 +7,13 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('home') }}">Trang chủ</a></li>
+            @if($book->category)
+            <li class="breadcrumb-item">
+                <a href="{{ route('books.category', $book->category->slug) }}">
+                    {{ $book->category->name }}
+                </a>
+            </li>
+            @endif
             <li class="breadcrumb-item active" aria-current="page">{{ $book->title }}</li>
         </ol>
     </nav>
@@ -33,11 +40,11 @@
                         <i class="bi bi-person-circle me-2"></i>Tác giả: {{ $book->author }}
                     </p>
                     <p class="text-muted mb-3">
-                        <i class="bi bi-bookmark-fill me-2"></i>Thể loại: {{ $book->category }}
+                        <i class="bi bi-bookmark-fill me-2"></i>Thể loại: {{ $book->category ? $book->category->name : 'Chưa phân loại' }}
                     </p>
                     <div class="d-flex align-items-center mb-4">
                         <h3 class="text-primary mb-0 me-3">{{ number_format($book->price) }}đ</h3>
-                        @if($book->stock > 0)
+                        @if($book->quantity > 0)
                             <span class="badge bg-success">Còn hàng</span>
                         @else
                             <span class="badge bg-danger">Hết hàng</span>
@@ -52,12 +59,12 @@
                                 <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
                                     <i class="bi bi-dash"></i>
                                 </button>
-                                <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->stock }}" id="quantity">
+                                <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->quantity }}" id="quantity">
                                 <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
                                     <i class="bi bi-plus"></i>
                                 </button>
                             </div>
-                            <button type="submit" class="btn btn-primary" {{ $book->stock == 0 ? 'disabled' : '' }}>
+                            <button type="submit" class="btn btn-primary" {{ $book->quantity == 0 ? 'disabled' : '' }}>
                                 <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ
                             </button>
                         </form>
@@ -108,6 +115,11 @@
                         </h5>
                         <p class="card-text text-muted">{{ Str::limit($relatedBook->author, 20) }}</p>
                         <p class="card-text text-primary fw-bold">{{ number_format($relatedBook->price) }}đ</p>
+                        @if($relatedBook->quantity > 0)
+                            <span class="badge bg-success">Còn hàng</span>
+                        @else
+                            <span class="badge bg-danger">Hết hàng</span>
+                        @endif
                     </div>
                 </div>
             </div>

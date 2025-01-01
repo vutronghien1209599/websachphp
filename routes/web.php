@@ -13,6 +13,10 @@ use App\Http\Controllers\Admin\BookManagementController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\VNPayController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DiscountController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ProfileController;
 
 // Route cho khách
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -26,11 +30,12 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 // Route cho sách
 Route::prefix('books')->group(function () {
     Route::get('/', [BookController::class, 'index'])->name('books.index');
     Route::get('/{book}', [BookController::class, 'show'])->name('books.show');
-    Route::get('/category/{category}', [BookController::class, 'category'])->name('books.category');
+    Route::get('/category/{slug}', [BookController::class, 'category'])->name('books.category');
 });
 
 // Route cho user đã đăng nhập
@@ -44,11 +49,16 @@ Route::middleware('auth')->group(function () {
         Route::delete('/', [CartController::class, 'clear'])->name('cart.clear');
     });
 
+    // Áp dụng mã giảm giá
+    Route::post('/discounts/apply', [App\Http\Controllers\DiscountController::class, 'apply'])->name('discounts.apply');
+
+    // Thanh toán
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('orders.checkout');
+
     // Quản lý đơn hàng
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('orders.index');
         Route::get('/{order}', [OrderController::class, 'show'])->name('orders.show');
-        Route::post('/checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
     });
 
     // Thanh toán VNPay
@@ -58,14 +68,23 @@ Route::middleware('auth')->group(function () {
     });
 
     // Thông tin cá nhân
-    Route::get('/profile', [HomeController::class, 'profile'])->name('profile');
-    Route::put('/profile', [HomeController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
 // Route cho admin
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Quản lý danh mục
+    Route::prefix('categories')->group(function () {
+        Route::get('/', [CategoryController::class, 'index'])->name('categories.index');
+        Route::post('/', [CategoryController::class, 'store'])->name('categories.store');
+        Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+        Route::put('/{category}', [CategoryController::class, 'update'])->name('categories.update');
+        Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    });
 
     // Quản lý sách
     Route::prefix('books')->group(function () {
@@ -93,4 +112,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::put('/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
+
+    // Quản lý voucher
+    Route::resource('discounts', DiscountController::class);
 });

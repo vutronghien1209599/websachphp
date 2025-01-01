@@ -111,23 +111,61 @@
                 <div class="card-body">
                     <h5 class="card-title mb-4">Tổng đơn hàng</h5>
                     
+                    @if(!$cartItems->isEmpty())
+                        <form id="discount-form" action="{{ route('discounts.apply') }}" method="POST" class="mb-4">
+                            @csrf
+                            <div class="input-group">
+                                <input type="text" name="code" class="form-control" 
+                                       placeholder="Nhập mã giảm giá" 
+                                       value="{{ session('applied_discount.code') ?? '' }}">
+                                <button class="btn btn-outline-primary" type="submit">Áp dụng</button>
+                            </div>
+                            <div id="discount-message" class="small mt-2"></div>
+                            @if(session('applied_discount'))
+                                <div class="text-success small mt-2">
+                                    Đã áp dụng mã giảm giá: {{ session('applied_discount.code') }}
+                                </div>
+                            @endif
+                        </form>
+                    @endif
+
                     <div class="d-flex justify-content-between mb-3">
                         <span>Tạm tính:</span>
-                        <span>{{ number_format($total) }}đ</span>
+                        <span id="subtotal">{{ number_format($subtotal) }}đ</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Phí vận chuyển:</span>
                         <span>30,000đ</span>
                     </div>
+                    <div id="discount-amount-row" class="d-flex justify-content-between mb-3" style="{{ session('applied_discount') ? '' : 'display: none;' }}">
+                        <span>Giảm giá:</span>
+                        <span class="text-danger" id="discount-amount">-{{ number_format(session('applied_discount.amount') ?? 0) }}đ</span>
+                    </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-4">
                         <strong>Tổng cộng:</strong>
-                        <strong class="text-primary">{{ number_format($total + 30000) }}đ</strong>
+                        <strong class="text-primary" id="total-amount">
+                            {{ number_format($subtotal + 30000 - (session('applied_discount.amount') ?? 0)) }}đ
+                        </strong>
                     </div>
 
                     @if(!$cartItems->isEmpty())
                         <form action="{{ route('orders.checkout') }}" method="POST">
                             @csrf
+                            <div class="mb-3">
+                                <label class="form-label">Thông tin giao hàng</label>
+                                <input type="text" class="form-control mb-2" name="shipping_name" 
+                                       value="{{ auth()->user()->full_name }}"
+                                       placeholder="Họ tên người nhận" required>
+                                <input type="text" class="form-control mb-2" name="shipping_phone"
+                                       value="{{ auth()->user()->phone_number }}"
+                                       placeholder="Số điện thoại" required>
+                                <textarea class="form-control mb-2" name="shipping_address" 
+                                          placeholder="Địa chỉ giao hàng" required>{{ auth()->user()->address }}</textarea>
+                                <textarea class="form-control" name="note" 
+                                          placeholder="Ghi chú đơn hàng (không bắt buộc)"></textarea>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Phương thức thanh toán</label>
                                 <div class="form-check">
@@ -156,4 +194,53 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $('#discount-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        let form = $(this);
+        let url = form.attr('action');
+        let data = form.serialize();
+        
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: data,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#discount-message')
+                        .removeClass('text-danger')
+                        .addClass('text-success')
+                        .text(response.message);
+                    
+                    $('#discount-amount-row').show();
+                    $('#discount-amount').text('-' + response.discount.formatted_amount);
+                    $('#total-amount').text(response.discount.formatted_total);
+                } else {
+                    $('#discount-message')
+                        .removeClass('text-success')
+                        .addClass('text-danger')
+                        .text(response.message);
+                    
+                    $('#discount-amount-row').hide();
+                    $('#total-amount').text('{{ number_format($subtotal + 30000) }}đ');
+                }
+            },
+            error: function() {
+                $('#discount-message')
+                    .removeClass('text-success')
+                    .addClass('text-danger')
+                    .text('Đã có lỗi xảy ra, vui lòng thử lại');
+            }
+        });
+    });
+});
+</script>
+@endpush
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,24 +17,25 @@ class BookManagementController extends Controller
 
     public function index(Request $request)
     {
-        $query = Book::query();
+        $query = Book::with('category');
 
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%{$search}%")
                   ->orWhere('author', 'like', "%{$search}%");
         }
 
-        if ($category = $request->input('category')) {
-            $query->where('category', $category);
+        if ($category_id = $request->input('category_id')) {
+            $query->where('category_id', $category_id);
         }
 
         $books = $query->latest()->paginate(10);
-        return view('admin.books.index', compact('books'));
+        $categories = Category::all();
+        return view('admin.books.index', compact('books', 'categories'));
     }
 
     public function create()
     {
-        $categories = ['Văn học', 'Kinh tế', 'Kỹ năng sống', 'Thiếu nhi', 'Giáo khoa'];
+        $categories = Category::all();
         return view('admin.books.create', compact('categories'));
     }
 
@@ -42,9 +44,9 @@ class BookManagementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
-            'category' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'quantity' => 'required|integer|min:0',
             'description' => 'required|string',
             'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:available,unavailable'
@@ -65,7 +67,7 @@ class BookManagementController extends Controller
 
     public function edit(Book $book)
     {
-        $categories = ['Văn học', 'Kinh tế', 'Kỹ năng sống', 'Thiếu nhi', 'Giáo khoa'];
+        $categories = Category::all();
         return view('admin.books.edit', compact('book', 'categories'));
     }
 
@@ -74,9 +76,9 @@ class BookManagementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
-            'category' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'quantity' => 'required|integer|min:0',
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:available,unavailable'

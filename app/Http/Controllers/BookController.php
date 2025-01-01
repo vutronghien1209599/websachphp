@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -19,7 +20,9 @@ class BookController extends Controller
 
         // Xử lý lọc theo danh mục
         if ($category = $request->input('category')) {
-            $query->where('category', $category);
+            $query->whereHas('category', function($q) use ($category) {
+                $q->where('slug', $category);
+            });
         }
 
         // Xử lý sắp xếp
@@ -36,8 +39,8 @@ class BookController extends Controller
         }
 
         // Phân trang với 12 item mỗi trang
-        $books = $query->paginate(12);
-        $categories = Book::distinct()->pluck('category');
+        $books = $query->with('category')->paginate(12);
+        $categories = Category::all();
 
         return view('books.index', compact('books', 'categories'));
     }
@@ -45,7 +48,7 @@ class BookController extends Controller
     public function show(Book $book)
     {
         // Lấy các sách liên quan cùng thể loại
-        $relatedBooks = Book::where('category', $book->category)
+        $relatedBooks = Book::where('category_id', $book->category_id)
             ->where('id', '!=', $book->id)
             ->take(4)
             ->get();
@@ -53,10 +56,11 @@ class BookController extends Controller
         return view('books.show', compact('book', 'relatedBooks'));
     }
 
-    public function category($category)
+    public function category($slug)
     {
-        $books = Book::where('category', $category)->paginate(12);
-        $categories = Book::distinct()->pluck('category');
+        $category = Category::where('slug', $slug)->firstOrFail();
+        $books = Book::where('category_id', $category->id)->paginate(12);
+        $categories = Category::all();
 
         return view('books.index', compact('books', 'categories'));
     }

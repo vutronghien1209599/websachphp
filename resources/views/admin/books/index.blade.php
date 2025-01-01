@@ -13,6 +13,33 @@
 
     <div class="card">
         <div class="card-body">
+            <!-- Form lọc -->
+            <form action="{{ route('admin.books.index') }}" method="GET" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" name="search" class="form-control" 
+                               placeholder="Tìm theo tên sách hoặc tác giả" 
+                               value="{{ request('search') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="category_id" class="form-select">
+                            <option value="">Tất cả danh mục</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" 
+                                        {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                    </div>
+                </div>
+            </form>
+
             <div class="table-responsive">
                 <table class="table">
                     <thead>
@@ -38,9 +65,9 @@
                                 </td>
                                 <td>{{ $book->title }}</td>
                                 <td>{{ $book->author }}</td>
-                                <td>{{ $book->category }}</td>
+                                <td>{{ $book->category->name }}</td>
                                 <td>{{ number_format($book->price) }}đ</td>
-                                <td>{{ $book->stock }}</td>
+                                <td>{{ $book->quantity }}</td>
                                 <td>
                                     @if($book->status === 'available')
                                         <span class="badge bg-success">Còn hàng</span>

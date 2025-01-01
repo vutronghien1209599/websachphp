@@ -12,8 +12,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('total_amount', 10, 2);
+            $table->string('shipping_name');
+            $table->string('shipping_phone');
             $table->text('shipping_address');
-            $table->string('payment_method');
+            $table->text('note')->nullable();
+            $table->foreignId('discount_id')->nullable()->constrained()->nullOnDelete();
+            $table->decimal('discount_amount', 10, 2)->default(0);
             $table->string('status')->default('pending');
             $table->timestamps();
         });

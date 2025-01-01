@@ -13,9 +13,9 @@ class CreateBooksTable extends Migration
             $table->string('title');
             $table->string('author');
             $table->text('description');
-            $table->string('category');
+            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('price', 10, 0);
-            $table->integer('stock');
+            $table->integer('quantity');
             $table->string('image')->nullable();
             $table->enum('status', ['available', 'unavailable'])->default('available');
             $table->timestamps();
