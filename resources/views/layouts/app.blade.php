@@ -209,9 +209,6 @@
                             <li><a class="dropdown-item" href="{{ route('orders.index') }}">
                                     <i class="bi bi-bag"></i> Đơn hàng của tôi
                                 </a></li>
-                            <li><a class="dropdown-item" href="#">
-                                    <i class="bi bi-heart"></i> Sách yêu thích
-                                </a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>

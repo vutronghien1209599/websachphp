@@ -58,16 +58,10 @@
                 <div class="card book-card h-100 border-0 shadow-sm">
                     <div class="position-relative">
                         <div class="book-image">
-                            <img src="{{ asset('storage/books/'.$book->image) }}" 
-                                 class="card-img-top" 
-                                 alt="{{ $book->title }}">
+                            <img src="{{ asset('storage/books/'.$book->image) }}"
+                                class="card-img-top"
+                                alt="{{ $book->title }}">
                         </div>
-                        @if($book->status === 'available')
-                        <button class="btn btn-primary quick-add-btn" 
-                                onclick="addToCart({{ $book->id }})">
-                            <i class="bi bi-cart-plus"></i>
-                        </button>
-                        @endif
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -78,9 +72,9 @@
                             </div>
                             <div class="book-status">
                                 @if($book->status === 'available')
-                                    <span class="badge bg-success-subtle text-success">Còn hàng</span>
+                                <span class="badge bg-success-subtle text-success">Còn hàng</span>
                                 @else
-                                    <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
+                                <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
                                 @endif
                             </div>
                         </div>
@@ -96,9 +90,24 @@
                                 <div class="price text-primary fw-bold">{{ number_format($book->price) }}đ</div>
                             </div>
                             @if($book->status === 'available')
-                            <button class="btn btn-primary" onclick="addToCart({{ $book->id }})">
-                                <i class="bi bi-cart-plus"></i>
-                            </button>
+                            <div class="mb-4">
+                                <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
+                                    @csrf
+                                    <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                    <div class="input-group me-3" style="width: 130px;">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->quantity }}" id="quantity">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" {{ $book->quantity == 0 ? 'disabled' : '' }}>
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
                             @endif
                         </div>
                     </div>
@@ -125,16 +134,11 @@
                 <div class="card book-card h-100 border-0 shadow-sm">
                     <div class="position-relative">
                         <div class="book-image">
-                            <img src="{{ asset('storage/books/'.$book->image) }}" 
-                                 class="card-img-top" 
-                                 alt="{{ $book->title }}">
+                            <img src="{{ asset('storage/books/'.$book->image) }}"
+                                class="card-img-top"
+                                alt="{{ $book->title }}">
                         </div>
-                        @if($book->status === 'available')
-                        <button class="btn btn-primary quick-add-btn" 
-                                onclick="addToCart({{ $book->id }})">
-                            <i class="bi bi-cart-plus"></i>
-                        </button>
-                        @endif
+                        
                     </div>
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -145,9 +149,9 @@
                             </div>
                             <div class="book-status">
                                 @if($book->status === 'available')
-                                    <span class="badge bg-success-subtle text-success">Còn hàng</span>
+                                <span class="badge bg-success-subtle text-success">Còn hàng</span>
                                 @else
-                                    <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
+                                <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
                                 @endif
                             </div>
                         </div>
@@ -163,9 +167,24 @@
                                 <div class="price text-primary fw-bold">{{ number_format($book->price) }}đ</div>
                             </div>
                             @if($book->status === 'available')
-                            <button class="btn btn-primary" onclick="addToCart({{ $book->id }})">
-                                <i class="bi bi-cart-plus"></i>
-                            </button>
+                            <div class="mb-4">
+                                <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
+                                    @csrf
+                                    <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                    <div class="input-group me-3" style="width: 130px;">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->quantity }}" id="quantity">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" {{ $book->quantity == 0 ? 'disabled' : '' }}>
+                                    <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
                             @endif
                         </div>
                     </div>
@@ -179,432 +198,348 @@
 
 @push('styles')
 <style>
-:root {
-    --primary-color: #2c3e50;
-    --primary-light: #3498db;
-    --primary-dark: #2980b9;
-    --success-color: #27ae60;
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
-    --gray-100: #f8f9fa;
-    --gray-200: #e9ecef;
-    --gray-300: #dee2e6;
-    --gray-400: #ced4da;
-    --gray-500: #adb5bd;
-    --gray-600: #6c757d;
-    --gray-700: #495057;
-    --gray-800: #343a40;
-    --gray-900: #212529;
-}
-
-.hero-section {
-    margin-top: -1.5rem;
-    margin-bottom: 4rem;
-}
-
-.carousel-item {
-    height: 70vh;
-    min-height: 500px;
-    max-height: 700px;
-}
-
-.carousel-item img {
-    object-fit: cover;
-    height: 100%;
-    filter: brightness(0.5);
-}
-
-.carousel-caption {
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(8px);
-    padding: 3rem;
-    border-radius: 1.5rem;
-    max-width: 700px;
-    margin: 0 auto;
-    bottom: 50%;
-    transform: translateY(50%);
-}
-
-.carousel-caption h1 {
-    font-size: 3.5rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-.carousel-caption p {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-}
-
-.carousel-caption .btn {
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.section-header {
-    text-align: center;
-    margin-bottom: 4rem;
-}
-
-.section-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--gray-800);
-    margin-bottom: 1rem;
-    position: relative;
-    display: inline-block;
-    padding-bottom: 1rem;
-}
-
-.section-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background: var(--primary-light);
-    border-radius: 2px;
-}
-
-.section-subtitle {
-    font-size: 1.1rem;
-    color: var(--gray-600);
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.category-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    height: 100%;
-}
-
-.category-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--primary-light);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.category-card i {
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
-}
-
-.category-card h5 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--gray-800);
-}
-
-.book-card {
-    background: white;
-    border-radius: 1rem;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    height: 100%;
-}
-
-.book-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-}
-
-.book-image {
-    height: 350px;
-    position: relative;
-    overflow: hidden;
-}
-
-.book-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-.book-card:hover .book-image img {
-    transform: scale(1.1);
-}
-
-.book-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.book-card:hover .book-overlay {
-    opacity: 1;
-}
-
-.book-actions {
-    display: flex;
-    gap: 1rem;
-}
-
-.book-actions .btn {
-    width: 45px;
-    height: 45px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    border-radius: 50%;
-    background: white;
-    color: var(--primary-color);
-    transition: all 0.3s ease;
-}
-
-.book-actions .btn:hover {
-    background: var(--primary-light);
-    color: white;
-    transform: scale(1.1);
-}
-
-.card-body {
-    padding: 1.5rem;
-}
-
-.badge {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    border-radius: 50rem;
-}
-
-.bg-primary-subtle {
-    background: rgba(52, 152, 219, 0.1);
-    color: var(--primary-light) !important;
-}
-
-.bg-success-subtle {
-    background: rgba(39, 174, 96, 0.1);
-    color: var(--success-color) !important;
-}
-
-.bg-danger-subtle {
-    background: rgba(231, 76, 60, 0.1);
-    color: var(--danger-color) !important;
-}
-
-.price {
-    font-size: 1.25rem;
-    color: var(--primary-light);
-}
-
-.promo-banner {
-    margin: 5rem 0;
-}
-
-.promo-card {
-    height: 350px;
-    border-radius: 1.5rem;
-    overflow: hidden;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.promo-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(45deg, rgba(0,0,0,0.7), transparent);
-    z-index: 1;
-}
-
-.promo-card > div {
-    position: relative;
-    z-index: 2;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.promo-card:hover {
-    transform: translateY(-10px);
-}
-
-.bg-gradient-primary {
-    background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-}
-
-.bg-gradient-success {
-    background: linear-gradient(45deg, var(--success-color), #2ecc71);
-}
-
-.newsletter {
-    background: var(--gray-100);
-    border-radius: 1.5rem;
-    overflow: hidden;
-    margin: 5rem 0;
-}
-
-.newsletter img {
-    height: 100%;
-    object-fit: cover;
-}
-
-.newsletter-content {
-    padding: 4rem;
-}
-
-.input-group-lg .form-control {
-    border-radius: 50rem 0 0 50rem;
-    padding: 1rem 1.5rem;
-    font-size: 1.1rem;
-}
-
-.input-group-lg .btn {
-    border-radius: 0 50rem 50rem 0;
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-}
-
-@media (max-width: 768px) {
-    .carousel-caption {
-        padding: 1.5rem;
-        max-width: 90%;
+    :root {
+        --primary-color: #2c3e50;
+        --primary-light: #3498db;
+        --primary-dark: #2980b9;
+        --success-color: #27ae60;
+        --warning-color: #f39c12;
+        --danger-color: #e74c3c;
+        --gray-100: #f8f9fa;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-400: #ced4da;
+        --gray-500: #adb5bd;
+        --gray-600: #6c757d;
+        --gray-700: #495057;
+        --gray-800: #343a40;
+        --gray-900: #212529;
     }
 
-    .carousel-caption h1 {
-        font-size: 2rem;
+    .hero-section {
+        margin-top: -1.5rem;
+        margin-bottom: 4rem;
     }
 
     .carousel-item {
-        height: 60vh;
+        height: 70vh;
+        min-height: 500px;
+        max-height: 700px;
+    }
+
+    .carousel-item img {
+        object-fit: cover;
+        height: 100%;
+        filter: brightness(0.5);
+    }
+
+    .carousel-caption {
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(8px);
+        padding: 3rem;
+        border-radius: 1.5rem;
+        max-width: 700px;
+        margin: 0 auto;
+        bottom: 50%;
+        transform: translateY(50%);
+    }
+
+    .carousel-caption h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .carousel-caption p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .carousel-caption .btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 1rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: var(--primary-light);
+        border-radius: 2px;
+    }
+
+    .section-subtitle {
+        font-size: 1.1rem;
+        color: var(--gray-600);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .category-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        height: 100%;
+    }
+
+    .category-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary-light);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-card i {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .category-card h5 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--gray-800);
+    }
+
+    .book-card {
+        background: white;
+        border-radius: 1rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .book-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .book-image {
+        height: 350px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .book-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .book-card:hover .book-image img {
+        transform: scale(1.1);
+    }
+
+    .book-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .book-card:hover .book-overlay {
+        opacity: 1;
+    }
+
+    .book-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .book-actions .btn {
+        width: 45px;
+        height: 45px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        border-radius: 50%;
+        background: white;
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .book-actions .btn:hover {
+        background: var(--primary-light);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border-radius: 50rem;
+    }
+
+    .bg-primary-subtle {
+        background: rgba(52, 152, 219, 0.1);
+        color: var(--primary-light) !important;
+    }
+
+    .bg-success-subtle {
+        background: rgba(39, 174, 96, 0.1);
+        color: var(--success-color) !important;
+    }
+
+    .bg-danger-subtle {
+        background: rgba(231, 76, 60, 0.1);
+        color: var(--danger-color) !important;
+    }
+
+    .price {
+        font-size: 1.25rem;
+        color: var(--primary-light);
+    }
+
+    .promo-banner {
+        margin: 5rem 0;
     }
 
     .promo-card {
-        height: 250px;
+        height: 350px;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .promo-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(45deg, rgba(0, 0, 0, 0.7), transparent);
+        z-index: 1;
+    }
+
+    .promo-card>div {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .promo-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(45deg, var(--success-color), #2ecc71);
+    }
+
+    .newsletter {
+        background: var(--gray-100);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        margin: 5rem 0;
+    }
+
+    .newsletter img {
+        height: 100%;
+        object-fit: cover;
     }
 
     .newsletter-content {
-        padding: 2rem;
+        padding: 4rem;
     }
-}
+
+    .input-group-lg .form-control {
+        border-radius: 50rem 0 0 50rem;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .input-group-lg .btn {
+        border-radius: 0 50rem 50rem 0;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .carousel-caption {
+            padding: 1.5rem;
+            max-width: 90%;
+        }
+
+        .carousel-caption h1 {
+            font-size: 2rem;
+        }
+
+        .carousel-item {
+            height: 60vh;
+        }
+
+        .promo-card {
+            height: 250px;
+        }
+
+        .newsletter-content {
+            padding: 2rem;
+        }
+    }
 </style>
 @endpush
 
 @push('scripts')
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Khởi tạo các nút thêm vào giỏ hàng
-    document.querySelectorAll('[data-add-to-cart]').forEach(button => {
-        button.addEventListener('click', function() {
-            const bookId = this.dataset.addToCart;
-            addToCart(bookId);
-        });
-    });
-
-    // Khởi tạo các nút thêm vào wishlist
-    document.querySelectorAll('[data-add-to-wishlist]').forEach(button => {
-        button.addEventListener('click', function() {
-            const bookId = this.dataset.addToWishlist;
-            addToWishlist(bookId);
-        });
-    });
-
-    // Hàm thêm vào giỏ hàng
-    function addToCart(bookId) {
-        @auth
-            fetch(`/cart/add/${bookId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    quantity: 1
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('Thành công', 'Đã thêm sách vào giỏ hàng', 'success');
-                    updateCartBadge();
-                } else {
-                    showToast('Lỗi', data.message || 'Có lỗi xảy ra', 'danger');
-                }
-            })
-            .catch(error => {
-                showToast('Lỗi', 'Không thể thêm vào giỏ hàng', 'danger');
-            });
-        @else
-            window.location.href = '{{ route('login') }}';
-        @endauth
+function incrementQuantity() {
+    const input = document.getElementById('quantity');
+    const max = parseInt(input.getAttribute('max'));
+    const currentValue = parseInt(input.value);
+    if (currentValue < max) {
+        input.value = currentValue + 1;
     }
+}
 
-    // Hàm thêm vào wishlist
-    function addToWishlist(bookId) {
-        @auth
-            fetch(`/wishlist/add/${bookId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('Thành công', 'Đã thêm vào danh sách yêu thích', 'success');
-                } else {
-                    showToast('Lỗi', data.message || 'Có lỗi xảy ra', 'danger');
-                }
-            })
-            .catch(error => {
-                showToast('Lỗi', 'Không thể thêm vào danh sách yêu thích', 'danger');
-            });
-        @else
-            window.location.href = '{{ route('login') }}';
-        @endauth
+function decrementQuantity() {
+    const input = document.getElementById('quantity');
+    const currentValue = parseInt(input.value);
+    if (currentValue > 1) {
+        input.value = currentValue - 1;
     }
-
-    // Hàm hiển thị toast notification
-    function showToast(title, message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = 'toast position-fixed bottom-0 end-0 m-3';
-        toast.setAttribute('role', 'alert');
-        toast.innerHTML = `
-            <div class="toast-header bg-${type} text-white">
-                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-                <strong class="me-auto">${title}</strong>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body">
-                ${message}
-            </div>
-        `;
-        document.body.appendChild(toast);
-        new bootstrap.Toast(toast).show();
-    }
-
-    // Hàm cập nhật số lượng trong giỏ hàng
-    function updateCartBadge() {
-        const cartBadge = document.querySelector('.cart-badge');
-        if (cartBadge) {
-            const currentCount = parseInt(cartBadge.textContent || '0');
-            cartBadge.textContent = currentCount + 1;
-        }
-    }
-});
+}
 </script>
 @endpush
 
@@ -621,4 +556,4 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-@endsection 
+@endsection

@@ -111,9 +111,6 @@
                                     <button class="btn btn-primary btn-sm" data-add-to-cart="{{ $book->id }}" data-book-title="{{ $book->title }}">
                                         <i class="bi bi-cart-plus"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" data-add-to-wishlist="{{ $book->id }}" data-book-title="{{ $book->title }}">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
                                     @endif
                                 </div>
                             </div>
@@ -144,9 +141,24 @@
                                         <div class="text-primary fw-bold">{{ number_format($book->price) }}đ</div>
                                     </div>
                                     @if($book->quantity > 0)
-                                    <button class="btn btn-primary" data-add-to-cart="{{ $book->id }}" data-book-title="{{ $book->title }}">
-                                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                                    <div class="mb-4">
+                                <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
+                                    @csrf
+                                    <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                    <div class="input-group me-3" style="width: 130px;">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->quantity }}" id="quantity">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary" {{ $book->quantity == 0 ? 'disabled' : '' }}>
+                                        <i class="bi bi-cart-plus"></i>
                                     </button>
+                                </form>
+                            </div>
                                     @endif
                                 </div>
                             </div>
@@ -252,110 +264,21 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Xử lý nút thêm vào giỏ hàng
-    document.querySelectorAll('[data-add-to-cart]').forEach(button => {
-        button.addEventListener('click', function() {
-            const bookId = this.dataset.addToCart;
-            const bookTitle = this.dataset.bookTitle;
-            addToCart(bookId, bookTitle);
-        });
-    });
-
-    // Xử lý nút thêm vào yêu thích
-    document.querySelectorAll('[data-add-to-wishlist]').forEach(button => {
-        button.addEventListener('click', function() {
-            const bookId = this.dataset.addToWishlist;
-            const bookTitle = this.dataset.bookTitle;
-            addToWishlist(bookId, bookTitle);
-        });
-    });
-
-    // Hàm thêm vào giỏ hàng
-    function addToCart(bookId, bookTitle) {
-        fetch(`/cart/add/${bookId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Cập nhật số lượng giỏ hàng
-                const cartBadge = document.querySelector('.cart-link .badge');
-                if (cartBadge) {
-                    cartBadge.textContent = data.cartCount;
-                }
-                
-                // Hiển thị thông báo
-                Swal.fire({
-                    title: 'Thành công!',
-                    text: `Đã thêm "${bookTitle}" vào giỏ hàng`,
-                    icon: 'success',
-                    showCancelButton: true,
-                    confirmButtonText: 'Xem giỏ hàng',
-                    cancelButtonText: 'Tiếp tục mua sắm'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/cart';
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: 'Lỗi!',
-                    text: data.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng',
-                    icon: 'error'
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                title: 'Lỗi!',
-                text: 'Có lỗi xảy ra khi thêm vào giỏ hàng',
-                icon: 'error'
-            });
-        });
+function incrementQuantity() {
+    const input = document.getElementById('quantity');
+    const max = parseInt(input.getAttribute('max'));
+    const currentValue = parseInt(input.value);
+    if (currentValue < max) {
+        input.value = currentValue + 1;
     }
+}
 
-    // Hàm thêm vào yêu thích
-    function addToWishlist(bookId, bookTitle) {
-        fetch(`/wishlist/add/${bookId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    title: 'Thành công!',
-                    text: `Đã thêm "${bookTitle}" vào danh sách yêu thích`,
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                Swal.fire({
-                    title: 'Lỗi!',
-                    text: data.message || 'Có lỗi xảy ra khi thêm vào danh sách yêu thích',
-                    icon: 'error'
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                title: 'Lỗi!',
-                text: 'Có lỗi xảy ra khi thêm vào danh sách yêu thích',
-                icon: 'error'
-            });
-        });
+function decrementQuantity() {
+    const input = document.getElementById('quantity');
+    const currentValue = parseInt(input.value);
+    if (currentValue > 1) {
+        input.value = currentValue - 1;
     }
-});
+}
 </script>
 @endpush 

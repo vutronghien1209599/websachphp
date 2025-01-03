@@ -119,7 +119,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.categories.index') }}">
-                                <i class="fas fa-fw fa-list"></i>
+                                <i class="bi bi-list"></i>
                                 <span>Quản lý danh mục</span>
                             </a>
                         </li>

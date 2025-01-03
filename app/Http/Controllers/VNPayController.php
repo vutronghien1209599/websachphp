@@ -12,6 +12,7 @@ class VNPayController extends Controller
 {
     public function createPayment(Order $order)
     {
+
         // Kiểm tra và in ra các giá trị để debug
         Log::info('VNPAY Config:', [
             'url' => config('app.vnpay_url'),
@@ -19,9 +20,12 @@ class VNPayController extends Controller
             'hash_secret' => config('app.vnpay_hash_secret'),
             'return_url' => config('app.vnpay_return_url'),
         ]);
-
+        
+        // URL của VNPAY
         $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+        // URL trả về khi thanh toán thành công
         $vnp_ReturnUrl = URL::to('/vnpay/return');
+        // Mã tài khoản của VNPAY
         $vnp_TmnCode = "GEBGNQZC";
         $vnp_HashSecret = "391WOHKIIMQZIH348STZWJTF1I9LO974";
 

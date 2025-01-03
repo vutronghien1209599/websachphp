@@ -29,11 +29,13 @@ class CartController extends Controller
 
     public function add(Request $request)
     {
+        // Validate dữ liệu được gửi từ form
         $validated = $request->validate([
             'book_id' => 'required|exists:books,id',
             'quantity' => 'required|integer|min:1'
         ]);
 
+        // Lấy sách theo id
         $book = Book::findOrFail($validated['book_id']);
 
         // Kiểm tra số lượng tồn kho
@@ -68,10 +70,12 @@ class CartController extends Controller
 
     public function update(Request $request, CartItem $cartItem)
     {
+        // Kiểm tra xem người dùng có phải là người dùng đang đăng nhập không
         if ($cartItem->user_id !== auth()->id()) {
             abort(403);
         }
 
+        // Validate dữ liệu được gửi từ form
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1'
         ]);
@@ -88,6 +92,7 @@ class CartController extends Controller
 
     public function remove(CartItem $cartItem)
     {
+        // Kiểm tra xem người dùng có phải là người dùng đang đăng nhập không
         if ($cartItem->user_id !== auth()->id()) {
             abort(403);
         }
@@ -99,6 +104,7 @@ class CartController extends Controller
 
     public function clear()
     {
+        // Xóa toàn bộ giỏ hàng
         auth()->user()->cart()->delete();
         
         // Xóa thông tin giảm giá trong session

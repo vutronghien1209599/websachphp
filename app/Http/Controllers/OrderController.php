@@ -12,22 +12,28 @@ class OrderController extends Controller
 {
     public function index()
     {
+        // Lấy danh sách đơn hàng của người dùng đang đăng nhập
         $orders = auth()->user()->orders()->latest()->paginate(10);
+        // Trả ra giao diện orders.index với các biến truyền vào
         return view('orders.index', compact('orders'));
     }
 
     public function show(Order $order)
     {
+        // Kiểm tra xem người dùng có phải là người dùng đang đăng nhập không
         if ($order->user_id !== auth()->id()) {
             abort(403);
         }
 
+        // Trả ra giao diện orders.show với các biến truyền vào
         return view('orders.show', compact('order'));
     }
 
     public function checkout(Request $request)
     {
+        // Lấy người dùng đang đăng nhập
         $user = auth()->user();
+        // Lấy các sản phẩm trong giỏ hàng
         $cartItems = $user->cartItems;
 
         if ($cartItems->isEmpty()) {
@@ -55,6 +61,7 @@ class OrderController extends Controller
             $discountAmount = 0;
 
             if ($discount) {
+                // Tính giá trị giảm giá
                 $discountAmount = $discount->calculateDiscount($subtotal);
                 // Tăng số lần sử dụng của mã giảm giá
                 $discount->incrementUsage();

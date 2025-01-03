@@ -15,11 +15,13 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
+        // Trả ra giao diện auth.login
         return view('auth.login');
     }
 
     public function login(Request $request)
     {
+        // Validate dữ liệu được gửi từ form
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
@@ -27,6 +29,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
+            // Trả về trang chủ
             return redirect()->intended(route('home'));
         }
 
@@ -36,10 +39,14 @@ class LoginController extends Controller
     }
 
     public function logout(Request $request)
-    {
+    {   
+        // Đăng xuất người dùng
         Auth::logout();
+        // Hủy session
         $request->session()->invalidate();
+        // Tạo lại token
         $request->session()->regenerateToken();
+        // Trả về trang chủ
         return redirect()->route('home');
     }
 } 
