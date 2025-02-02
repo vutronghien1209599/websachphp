@@ -29,13 +29,26 @@ class BookController extends Controller
             });
         }
 
+        // Xử lý lọc theo tác giả
+        if ($authorId = $request->input('author')) {
+            $query->whereHas('authors', function($q) use ($authorId) {
+                $q->where('authors.id', $authorId);
+            });
+        }
+
         // Xử lý sắp xếp
         switch ($request->input('sort')) {
             case 'price_asc':
-                $query->orderBy('default_price', 'asc');
+                $query->orderBy('price', 'asc');
                 break;
             case 'price_desc':
-                $query->orderBy('default_price', 'desc');
+                $query->orderBy('price', 'desc');
+                break;
+            case 'name_asc':
+                $query->orderBy('title', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('title', 'desc');
                 break;
             default:
                 $query->latest();
@@ -43,10 +56,11 @@ class BookController extends Controller
         }
 
         // Phân trang với 12 item mỗi trang
-        $books = $query->with(['category', 'authors', 'editions'])->paginate(12);
+        $books = $query->with(['category', 'authors'])->paginate(12);
         $categories = Category::all();
+        $authors = \App\Models\Author::orderBy('name')->get();
 
-        return view('books.index', compact('books', 'categories'));
+        return view('books.index', compact('books', 'categories', 'authors'));
     }
 
     public function show(Book $book)

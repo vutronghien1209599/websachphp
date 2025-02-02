@@ -22,7 +22,20 @@
                                 @foreach($categories as $category)
                                     <option value="{{ $category->slug }}" 
                                             {{ request('category') == $category->slug ? 'selected' : '' }}>
-                                        <i class="{{ $category->icon }}"></i> {{ $category->name }}
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tác giả</label>
+                            <select name="author" class="form-select">
+                                <option value="">Tất cả tác giả</option>
+                                @foreach($authors as $author)
+                                    <option value="{{ $author->id }}" 
+                                            {{ request('author') == $author->id ? 'selected' : '' }}>
+                                        {{ $author->name }}
                                     </option>
                                 @endforeach
                             </select>

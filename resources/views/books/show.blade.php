@@ -110,7 +110,17 @@
                         <span class="text-muted">({{ $book->reviews_count }} đánh giá)</span>
                     </div>
                     <p class="text-muted mb-3">
-                        <i class="bi bi-person-circle me-2"></i>Tác giả: {{ $book->author }}
+                        <i class="bi bi-person-circle me-2"></i>Tác giả: 
+                        @if($book->authors->count() > 0)
+                            @foreach($book->authors as $author)
+                                <a href="#" class="text-decoration-none">
+                                    {{ $author->name }}
+                                </a>
+                                @if(!$loop->last), @endif
+                            @endforeach
+                        @else
+                            <span class="text-muted">Chưa cập nhật</span>
+                        @endif
                     </p>
                     <p class="text-muted mb-3">
                         <i class="bi bi-bookmark-fill me-2"></i>Thể loại: {{ $book->category ? $book->category->name : 'Chưa phân loại' }}

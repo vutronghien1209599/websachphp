@@ -432,15 +432,18 @@
                             <p class="text-muted">Bạn có thể hỏi về:</p>
                         </div>
                         <div class="suggestions">
+                            <!-- Nhóm tìm kiếm và sách -->
                             <div class="suggestion-chip" onclick="sendSuggestion(this)">
-                                <i class="far fa-clock"></i>Giờ mở cửa
+                                <i class="fas fa-book"></i>Sách mới
                             </div>
                             <div class="suggestion-chip" onclick="sendSuggestion(this)">
-                                <i class="fas fa-map-marker-alt"></i>Địa chỉ
+                                <i class="fas fa-user-edit"></i>Tìm sách theo tác giả
                             </div>
                             <div class="suggestion-chip" onclick="sendSuggestion(this)">
-                                <i class="fas fa-phone"></i>Liên hệ
+                                <i class="fas fa-tags"></i>Khuyến mãi
                             </div>
+
+                            <!-- Nhóm thông tin mua hàng -->
                             <div class="suggestion-chip" onclick="sendSuggestion(this)">
                                 <i class="fas fa-truck"></i>Phí vận chuyển
                             </div>
@@ -450,11 +453,16 @@
                             <div class="suggestion-chip" onclick="sendSuggestion(this)">
                                 <i class="fas fa-exchange-alt"></i>Đổi trả
                             </div>
+
+                            <!-- Nhóm thông tin liên hệ -->
                             <div class="suggestion-chip" onclick="sendSuggestion(this)">
-                                <i class="fas fa-book"></i>Sách mới
+                                <i class="far fa-clock"></i>Giờ mở cửa
                             </div>
                             <div class="suggestion-chip" onclick="sendSuggestion(this)">
-                                <i class="fas fa-tags"></i>Khuyến mãi
+                                <i class="fas fa-map-marker-alt"></i>Địa chỉ
+                            </div>
+                            <div class="suggestion-chip" onclick="sendSuggestion(this)">
+                                <i class="fas fa-phone"></i>Liên hệ
                             </div>
                         </div>
                     @endforelse
