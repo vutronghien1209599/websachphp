@@ -41,11 +41,12 @@ class CartController extends Controller
         $book = Book::findOrFail($validated['book_id']);
         $edition = BookEdition::where('book_id', $book->id)
             ->where('id', $validated['edition_id'])
+            ->where('status', 'available')
             ->firstOrFail();
 
         // Kiểm tra số lượng tồn kho của phiên bản
         if ($edition->quantity < $validated['quantity']) {
-            return back()->with('error', 'Số lượng sách trong kho không đủ');
+            return back()->with('error', 'Số lượng sách trong kho không đủ (chỉ còn ' . $edition->quantity . ' cuốn)');
         }
 
         // Kiểm tra xem sách đã có trong giỏ hàng chưa
@@ -59,7 +60,7 @@ class CartController extends Controller
             $newQuantity = $cartItem->quantity + $validated['quantity'];
             
             if ($edition->quantity < $newQuantity) {
-                return back()->with('error', 'Số lượng sách trong kho không đủ');
+                return back()->with('error', 'Số lượng sách trong kho không đủ (chỉ còn ' . $edition->quantity . ' cuốn)');
             }
 
             $cartItem->update(['quantity' => $newQuantity]);
@@ -89,8 +90,12 @@ class CartController extends Controller
 
         // Kiểm tra số lượng tồn kho của phiên bản
         $edition = $cartItem->bookEdition;
+        if (!$edition || $edition->status !== 'available') {
+            return back()->with('error', 'Phiên bản sách này hiện không khả dụng');
+        }
+
         if ($edition->quantity < $validated['quantity']) {
-            return back()->with('error', 'Số lượng sách trong kho không đủ');
+            return back()->with('error', 'Số lượng sách trong kho không đủ (chỉ còn ' . $edition->quantity . ' cuốn)');
         }
 
         $cartItem->update($validated);
