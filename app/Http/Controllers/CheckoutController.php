@@ -38,7 +38,7 @@ class CheckoutController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        $cartItems = $user->cart()->with('book')->get();
+        $cartItems = $user->cart()->with(['book', 'bookEdition'])->get();
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')
@@ -57,15 +57,15 @@ class CheckoutController extends Controller
 
             // Kiểm tra số lượng tồn kho
             foreach ($cartItems as $item) {
-                $book = Book::lockForUpdate()->find($item->book_id);
-                if (!$book || $book->quantity < $item->quantity) {
-                    throw new \Exception("Sản phẩm {$book->title} không đủ số lượng trong kho");
+                $edition = $item->bookEdition;
+                if (!$edition || $edition->quantity < $item->quantity) {
+                    throw new \Exception("Sản phẩm {$item->book->title} (Phiên bản: {$edition->edition_number}) không đủ số lượng trong kho");
                 }
             }
 
             // Tính tổng tiền trước khi giảm giá
             $subtotal = $cartItems->sum(function ($item) {
-                return $item->book->price * $item->quantity;
+                return $item->bookEdition->price * $item->quantity;
             });
 
             // Xử lý giảm giá
@@ -99,14 +99,15 @@ class CheckoutController extends Controller
                 OrderItem::create([
                     'order_id' => $order->id,
                     'book_id' => $item->book_id,
+                    'edition_id' => $item->edition_id,
                     'quantity' => $item->quantity,
-                    'price' => $item->book->price,
+                    'price' => $item->bookEdition->price,
                 ]);
 
-                // Cập nhật số lượng sách
-                $book = $item->book;
-                $book->quantity -= $item->quantity;
-                $book->save();
+                // Cập nhật số lượng phiên bản sách
+                $edition = $item->bookEdition;
+                $edition->quantity -= $item->quantity;
+                $edition->save();
             }
 
             // Xóa giỏ hàng
