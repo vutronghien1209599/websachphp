@@ -32,27 +32,30 @@ class CartController extends Controller
         // Validate dữ liệu được gửi từ form
         $validated = $request->validate([
             'book_id' => 'required|exists:books,id',
+            'edition_id' => 'required|exists:editions,id',
             'quantity' => 'required|integer|min:1'
         ]);
 
-        // Lấy sách theo id
+        // Lấy sách và phiên bản theo id
         $book = Book::findOrFail($validated['book_id']);
+        $edition = $book->editions()->findOrFail($validated['edition_id']);
 
-        // Kiểm tra số lượng tồn kho
-        if ($book->quantity < $validated['quantity']) {
+        // Kiểm tra số lượng tồn kho của phiên bản
+        if ($edition->quantity < $validated['quantity']) {
             return back()->with('error', 'Số lượng sách trong kho không đủ');
         }
 
         // Kiểm tra xem sách đã có trong giỏ hàng chưa
         $cartItem = auth()->user()->cart()
             ->where('book_id', $validated['book_id'])
+            ->where('edition_id', $validated['edition_id'])
             ->first();
 
         if ($cartItem) {
             // Nếu có rồi thì cộng thêm số lượng
             $newQuantity = $cartItem->quantity + $validated['quantity'];
             
-            if ($book->quantity < $newQuantity) {
+            if ($edition->quantity < $newQuantity) {
                 return back()->with('error', 'Số lượng sách trong kho không đủ');
             }
 
@@ -61,6 +64,7 @@ class CartController extends Controller
             // Nếu chưa có thì tạo mới
             auth()->user()->cart()->create([
                 'book_id' => $validated['book_id'],
+                'edition_id' => $validated['edition_id'], 
                 'quantity' => $validated['quantity']
             ]);
         }
@@ -80,8 +84,9 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
-        // Kiểm tra số lượng tồn kho
-        if ($cartItem->book->quantity < $validated['quantity']) {
+        // Kiểm tra số lượng tồn kho của phiên bản
+        $edition = $cartItem->edition;
+        if ($edition->quantity < $validated['quantity']) {
             return back()->with('error', 'Số lượng sách trong kho không đủ');
         }
 

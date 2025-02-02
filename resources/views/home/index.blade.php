@@ -71,10 +71,13 @@
                                 </span>
                             </div>
                             <div class="book-status">
-                                @if($book->status === 'available')
-                                <span class="badge bg-success-subtle text-success">Còn hàng</span>
+                                @php
+                                    $latestEdition = $book->editions->first();
+                                @endphp
+                                @if($latestEdition && $latestEdition->quantity > 0)
+                                    <span class="badge bg-success-subtle text-success">Còn hàng ({{ $latestEdition->quantity }})</span>
                                 @else
-                                <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
+                                    <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
                                 @endif
                             </div>
                         </div>
@@ -83,27 +86,32 @@
                                 {{ $book->title }}
                             </a>
                         </h5>
-                        <p class="card-text text-muted mb-3">{{ $book->author }}</p>
+                        <p class="card-text text-muted mb-3">
+                            @foreach($book->authors as $author)
+                                {{ $author->name }}@if(!$loop->last), @endif
+                            @endforeach
+                        </p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <span class="text-muted small">Giá bán</span>
-                                <div class="price text-primary fw-bold">{{ number_format($book->price) }}đ</div>
+                                <div class="price text-primary fw-bold">{{ number_format($latestEdition->price) }}đ</div>
                             </div>
-                            @if($book->status === 'available')
+                            @if($latestEdition && $latestEdition->quantity > 0)
                             <div class="mb-4">
                                 <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
                                     @csrf
                                     <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                    <input type="hidden" name="edition_id" value="{{ $latestEdition->id }}">
                                     <div class="input-group me-3" style="width: 130px;">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity('quantity-new-{{ $book->id }}')">
                                             <i class="bi bi-dash"></i>
                                         </button>
-                                        <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->quantity }}" id="quantity">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
+                                        <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $latestEdition->quantity }}" id="quantity-new-{{ $book->id }}">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity('quantity-new-{{ $book->id }}')">
                                             <i class="bi bi-plus"></i>
                                         </button>
                                     </div>
-                                    <button type="submit" class="btn btn-primary" {{ $book->quantity == 0 ? 'disabled' : '' }}>
+                                    <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-cart-plus"></i>
                                     </button>
                                 </form>
@@ -148,10 +156,13 @@
                                 </span>
                             </div>
                             <div class="book-status">
-                                @if($book->status === 'available')
-                                <span class="badge bg-success-subtle text-success">Còn hàng</span>
+                                @php
+                                    $latestEdition = $book->editions->first();
+                                @endphp
+                                @if($latestEdition && $latestEdition->quantity > 0)
+                                    <span class="badge bg-success-subtle text-success">Còn hàng ({{ $latestEdition->quantity }})</span>
                                 @else
-                                <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
+                                    <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
                                 @endif
                             </div>
                         </div>
@@ -160,28 +171,33 @@
                                 {{ $book->title }}
                             </a>
                         </h5>
-                        <p class="card-text text-muted mb-3">{{ $book->author }}</p>
+                        <p class="card-text text-muted mb-3">
+                            @foreach($book->authors as $author)
+                                {{ $author->name }}@if(!$loop->last), @endif
+                            @endforeach
+                        </p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <span class="text-muted small">Giá bán</span>
-                                <div class="price text-primary fw-bold">{{ number_format($book->price) }}đ</div>
+                                <div class="price text-primary fw-bold">{{ number_format($latestEdition->price) }}đ</div>
                             </div>
-                            @if($book->status === 'available')
+                            @if($latestEdition && $latestEdition->quantity > 0)
                             <div class="mb-4">
                                 <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
                                     @csrf
                                     <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                    <input type="hidden" name="edition_id" value="{{ $latestEdition->id }}">
                                     <div class="input-group me-3" style="width: 130px;">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity('quantity-best-{{ $book->id }}')">
                                             <i class="bi bi-dash"></i>
                                         </button>
-                                        <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->quantity }}" id="quantity">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
+                                        <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $latestEdition->quantity }}" id="quantity-best-{{ $book->id }}">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity('quantity-best-{{ $book->id }}')">
                                             <i class="bi bi-plus"></i>
                                         </button>
                                     </div>
-                                    <button type="submit" class="btn btn-primary" {{ $book->quantity == 0 ? 'disabled' : '' }}>
-                                    <i class="bi bi-cart-plus"></i>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-cart-plus"></i>
                                     </button>
                                 </form>
                             </div>
@@ -524,8 +540,8 @@
 @push('scripts')
 
 <script>
-function incrementQuantity() {
-    const input = document.getElementById('quantity');
+function incrementQuantity(quantityId) {
+    const input = document.getElementById(quantityId);
     const max = parseInt(input.getAttribute('max'));
     const currentValue = parseInt(input.value);
     if (currentValue < max) {
@@ -533,8 +549,8 @@ function incrementQuantity() {
     }
 }
 
-function decrementQuantity() {
-    const input = document.getElementById('quantity');
+function decrementQuantity(quantityId) {
+    const input = document.getElementById(quantityId);
     const currentValue = parseInt(input.value);
     if (currentValue > 1) {
         input.value = currentValue - 1;

@@ -12,10 +12,25 @@ class HomeController extends Controller
     {
         // Lấy danh sách các thể loại   
         $categories = Category::all();
-        // Lấy 8 sách mới nhất
-        $newBooks = Book::with('category')->latest()->take(8)->get();
-        // Lấy 4 sách bán chạy ngẫu nhiên
-        $bestSellers = Book::with('category')->inRandomOrder()->take(4)->get();
+        
+        // Lấy sách mới với phiên bản mới nhất
+        $newBooks = Book::where('status', 'active')
+            ->with(['category', 'authors', 'editions' => function($q) {
+                $q->latest('publication_date');
+            }])
+            ->latest()
+            ->take(8)
+            ->get();
+
+        // Lấy sách bán chạy với phiên bản mới nhất
+        $bestSellers = Book::where('status', 'active')
+            ->withCount('orderItems')
+            ->with(['category', 'authors', 'editions' => function($q) {
+                $q->latest('publication_date');
+            }])
+            ->orderByDesc('order_items_count')
+            ->take(8)
+            ->get();
 
         // Trả ra giao diện home.index với các biến truyền vào
         return view('home.index', compact('categories', 'newBooks', 'bestSellers'));

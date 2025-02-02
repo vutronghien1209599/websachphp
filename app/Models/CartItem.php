@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Edition;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,6 +13,7 @@ class CartItem extends Model
     protected $fillable = [
         'user_id',
         'book_id',
+        'edition_id',
         'quantity'
     ];
 
@@ -23,5 +25,10 @@ class CartItem extends Model
     public function book()
     {
         return $this->belongsTo(Book::class);
+    }
+
+    public function edition()
+    {
+        return $this->belongsTo(Edition::class);
     }
 } 
