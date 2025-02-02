@@ -12,7 +12,7 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cartItems = auth()->user()->cart()->with(['book', 'bookEdition'])->get();
+        $cartItems = auth()->user()->cart()->with(['book.authors', 'bookEdition'])->get();
         
         // Tính tổng tiền trước khi giảm giá
         $subtotal = $cartItems->sum(function ($item) {

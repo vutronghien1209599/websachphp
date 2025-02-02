@@ -46,7 +46,15 @@
                                                                 {{ $item->book->title }}
                                                             </a>
                                                         </h6>
-                                                        <small class="text-muted">{{ $item->book->author }}</small>
+                                                        <small class="text-muted">
+                                                            @foreach($item->book->authors as $author)
+                                                                {{ $author->name }}@if(!$loop->last), @endif
+                                                            @endforeach
+                                                        </small>
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            Phiên bản: {{ $item->bookEdition->edition_number }}, Tái bản: {{ $item->bookEdition->reprint_number }}
+                                                        </small>
                                                     </div>
                                                 </div>
                                             </td>
@@ -63,7 +71,7 @@
                                                         </button>
                                                         <input type="number" class="form-control text-center" 
                                                                name="quantity" value="{{ $item->quantity }}" 
-                                                               min="1" max="{{ $item->book->stock }}"
+                                                               min="1" max="{{ $item->bookEdition->quantity }}"
                                                                onchange="this.form.submit()">
                                                         <button class="btn btn-outline-secondary" type="button"
                                                                 onclick="this.parentNode.querySelector('input').stepUp()">
@@ -72,8 +80,8 @@
                                                     </div>
                                                 </form>
                                             </td>
-                                            <td class="text-end">{{ number_format($item->book->price) }}đ</td>
-                                            <td class="text-end">{{ number_format($item->book->price * $item->quantity) }}đ</td>
+                                            <td class="text-end">{{ number_format($item->bookEdition->price) }}đ</td>
+                                            <td class="text-end">{{ number_format($item->bookEdition->price * $item->quantity) }}đ</td>
                                             <td class="text-end">
                                                 <form action="{{ route('cart.remove', $item) }}" method="POST">
                                                     @csrf
@@ -222,6 +230,12 @@ $(document).ready(function() {
                     $('#discount-amount-row').show();
                     $('#discount-amount').text('-' + response.discount.formatted_amount);
                     $('#total-amount').text(response.discount.formatted_total);
+                    
+                    // Thêm class để highlight giảm giá
+                    $('#discount-amount').addClass('highlight');
+                    setTimeout(function() {
+                        $('#discount-amount').removeClass('highlight');
+                    }, 1000);
                 } else {
                     $('#discount-message')
                         .removeClass('text-success')
@@ -232,15 +246,31 @@ $(document).ready(function() {
                     $('#total-amount').text('{{ number_format($subtotal + 30000) }}đ');
                 }
             },
-            error: function() {
+            error: function(xhr) {
+                let message = 'Đã có lỗi xảy ra, vui lòng thử lại';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
                 $('#discount-message')
                     .removeClass('text-success')
                     .addClass('text-danger')
-                    .text('Đã có lỗi xảy ra, vui lòng thử lại');
+                    .text(message);
             }
         });
     });
 });
 </script>
+
+<style>
+.highlight {
+    animation: highlight 1s ease-in-out;
+}
+
+@keyframes highlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+</style>
 @endpush
 @endsection

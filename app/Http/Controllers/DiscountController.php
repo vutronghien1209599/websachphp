@@ -27,9 +27,9 @@ class DiscountController extends Controller
         }
 
         // Tính tổng giá trị đơn hàng
-        $cartItems = auth()->user()->cart()->with('book')->get();
+        $cartItems = auth()->user()->cart()->with(['book', 'bookEdition'])->get();
         $subtotal = $cartItems->sum(function ($item) {
-            return $item->book->price * $item->quantity;
+            return $item->bookEdition->price * $item->quantity;
         });
 
         if ($subtotal < $discount->min_order_amount) {
@@ -47,6 +47,9 @@ class DiscountController extends Controller
             'code' => $code,
             'amount' => $discountAmount
         ]);
+
+        // Tăng số lần sử dụng của mã
+        $discount->incrementUsage();
 
         return response()->json([
             'success' => true,
