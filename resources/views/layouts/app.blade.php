@@ -321,7 +321,7 @@
         "hideEasing": "linear",
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
-        
+         
     };
 
     @if(session('success'))
