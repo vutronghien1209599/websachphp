@@ -140,32 +140,86 @@ class BookManagementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
+            'author_ids' => 'required|array',
+            'author_ids.*' => 'exists:authors,id',
             'category_id' => 'required|exists:categories,id',
-            'price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
+            'publisher_id' => 'required|exists:publishers,id',
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'status' => 'required|in:available,unavailable'
+            'original_language' => 'required|string|max:50',
+            'status' => 'required|in:active,inactive',
+            // Thông tin phiên bản
+            'edition_id' => 'required|exists:book_editions,id',
+            'edition_number' => 'required|string|max:50',
+            'reprint_number' => 'required|integer|min:1',
+            'publication_date' => 'required|date',
+            'isbn' => 'required|string|unique:book_editions,isbn,' . $request->edition_id,
+            'pages' => 'required|integer|min:1',
+            'format' => 'required|string|max:50',
+            'dimensions' => 'nullable|string|max:50',
+            'weight' => 'nullable|numeric|min:0',
+            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:0'
         ]);
 
-        if ($request->hasFile('image')) {
-            // Xóa ảnh cũ
-            if ($book->image) {
-                Storage::delete('public/books/' . $book->image);
+        try {
+            DB::beginTransaction();
+
+            // Cập nhật slug từ title
+            $validated['slug'] = Str::slug($validated['title']);
+
+            // Upload ảnh mới nếu có
+            if ($request->hasFile('image')) {
+                // Xóa ảnh cũ
+                if ($book->image) {
+                    Storage::delete('public/books/' . $book->image);
+                }
+
+                $image = $request->file('image');
+                $filename = time() . '.' . $image->getClientOriginalExtension();
+                $image->storeAs('public/books', $filename);
+                $validated['image'] = $filename;
             }
 
-            // Upload ảnh mới
-            $image = $request->file('image');
-            $filename = time() . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('public/books', $filename);
-            $validated['image'] = $filename;
+            // Cập nhật thông tin sách
+            $book->update([
+                'title' => $validated['title'],
+                'slug' => $validated['slug'],
+                'description' => $validated['description'],
+                'category_id' => $validated['category_id'],
+                'publisher_id' => $validated['publisher_id'],
+                'original_language' => $validated['original_language'],
+                'image' => $validated['image'] ?? $book->image,
+                'status' => $validated['status']
+            ]);
+
+            // Cập nhật tác giả
+            $book->authors()->sync($validated['author_ids']);
+
+            // Cập nhật phiên bản
+            $edition = $book->editions()->findOrFail($validated['edition_id']);
+            $edition->update([
+                'edition_number' => $validated['edition_number'],
+                'reprint_number' => $validated['reprint_number'],
+                'publication_date' => $validated['publication_date'],
+                'isbn' => $validated['isbn'],
+                'pages' => $validated['pages'],
+                'format' => $validated['format'],
+                'dimensions' => $validated['dimensions'],
+                'weight' => $validated['weight'],
+                'price' => $validated['price'],
+                'quantity' => $validated['quantity']
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.books.index')
+                ->with('success', 'Cập nhật sách thành công');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
-
-        $book->update($validated);
-
-        return redirect()->route('admin.books.index')
-                        ->with('success', 'Cập nhật sách thành công');
     }
 
     public function destroy(Book $book)
