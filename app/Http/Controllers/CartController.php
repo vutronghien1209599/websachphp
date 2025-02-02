@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\BookEdition;
 use App\Models\CartItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
 class CartController extends Controller
@@ -41,8 +42,19 @@ class CartController extends Controller
         $book = Book::findOrFail($validated['book_id']);
         $edition = BookEdition::where('book_id', $book->id)
             ->where('id', $validated['edition_id'])
-            ->where('status', 'available')
-            ->firstOrFail();
+            ->first();
+
+        if (!$edition) {
+            return back()->with('error', 'Không tìm thấy phiên bản sách này');
+        }
+
+        // Log thông tin để debug
+        \Log::info('Book Edition Info:', [
+            'edition_id' => $edition->id,
+            'quantity' => $edition->quantity,
+            'status' => $edition->status,
+            'requested_quantity' => $validated['quantity']
+        ]);
 
         // Kiểm tra số lượng tồn kho của phiên bản
         if ($edition->quantity < $validated['quantity']) {
@@ -59,6 +71,14 @@ class CartController extends Controller
             // Nếu có rồi thì cộng thêm số lượng
             $newQuantity = $cartItem->quantity + $validated['quantity'];
             
+            // Log thông tin để debug
+            \Log::info('Cart Update Info:', [
+                'current_quantity' => $cartItem->quantity,
+                'add_quantity' => $validated['quantity'],
+                'new_quantity' => $newQuantity,
+                'stock_quantity' => $edition->quantity
+            ]);
+
             if ($edition->quantity < $newQuantity) {
                 return back()->with('error', 'Số lượng sách trong kho không đủ (chỉ còn ' . $edition->quantity . ' cuốn)');
             }
