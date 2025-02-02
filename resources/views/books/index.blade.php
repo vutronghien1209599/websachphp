@@ -155,19 +155,23 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="price">
                                         <span class="text-muted small">Giá bán</span>
-                                        <div class="text-primary fw-bold">{{ number_format($book->default_price) }}đ</div>
+                                        @php
+                                            $latestEdition = $book->editions->first();
+                                        @endphp
+                                        <div class="text-primary fw-bold">{{ number_format($latestEdition->price) }}đ</div>
                                     </div>
-                                    @if($book->total_quantity > 0)
+                                    @if($latestEdition && $latestEdition->quantity > 0)
                                     <div class="mb-4">
                                         <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
                                             @csrf
                                             <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                            <input type="hidden" name="edition_id" value="{{ $latestEdition->id }}">
                                             <div class="input-group me-3" style="width: 130px;">
-                                                <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity('quantity-{{ $book->id }}')">
                                                     <i class="bi bi-dash"></i>
                                                 </button>
-                                                <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->total_quantity }}" id="quantity">
-                                                <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
+                                                <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $latestEdition->quantity }}" id="quantity-{{ $book->id }}">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity('quantity-{{ $book->id }}')">
                                                     <i class="bi bi-plus"></i>
                                                 </button>
                                             </div>

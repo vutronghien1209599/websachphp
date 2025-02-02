@@ -36,13 +36,29 @@ class BookController extends Controller
             });
         }
 
+        // Xử lý lọc theo khoảng giá
+        if ($priceFrom = $request->input('price_from')) {
+            $query->whereHas('editions', function($q) use ($priceFrom) {
+                $q->where('price', '>=', $priceFrom);
+            });
+        }
+        if ($priceTo = $request->input('price_to')) {
+            $query->whereHas('editions', function($q) use ($priceTo) {
+                $q->where('price', '<=', $priceTo);
+            });
+        }
+
         // Xử lý sắp xếp
         switch ($request->input('sort')) {
             case 'price_asc':
-                $query->orderBy('price', 'asc');
+                $query->whereHas('editions', function($q) {
+                    $q->orderBy('price', 'asc');
+                });
                 break;
             case 'price_desc':
-                $query->orderBy('price', 'desc');
+                $query->whereHas('editions', function($q) {
+                    $q->orderBy('price', 'desc');
+                });
                 break;
             case 'name_asc':
                 $query->orderBy('title', 'asc');
@@ -55,8 +71,14 @@ class BookController extends Controller
                 break;
         }
 
+        // Chỉ lấy sách có trạng thái active
+        $query->where('status', 'active');
+
         // Phân trang với 12 item mỗi trang
-        $books = $query->with(['category', 'authors'])->paginate(12);
+        $books = $query->with(['category', 'authors', 'editions' => function($q) {
+            $q->latest('publication_date');
+        }])->paginate(12);
+
         $categories = Category::all();
         $authors = \App\Models\Author::orderBy('name')->get();
 
@@ -66,16 +88,24 @@ class BookController extends Controller
     public function show(Book $book)
     {
         // Load các quan hệ cần thiết
-        $book->load(['category', 'authors', 'editions', 'publisher']);
+        $book->load(['category', 'authors', 'editions' => function($q) {
+            $q->latest('publication_date');
+        }, 'publisher']);
+        
+        // Lấy phiên bản mới nhất
+        $latestEdition = $book->editions->first();
         
         // Lấy các sách liên quan cùng thể loại
         $relatedBooks = Book::where('category_id', $book->category_id)
             ->where('id', '!=', $book->id)
-            ->with(['authors', 'editions'])
+            ->where('status', 'active')
+            ->with(['authors', 'editions' => function($q) {
+                $q->latest('publication_date');
+            }])
             ->take(4)
             ->get();
 
-        return view('books.show', compact('book', 'relatedBooks'));
+        return view('books.show', compact('book', 'relatedBooks', 'latestEdition'));
     }
 
     public function category($slug)

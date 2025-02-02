@@ -125,10 +125,24 @@
                     <p class="text-muted mb-3">
                         <i class="bi bi-bookmark-fill me-2"></i>Thể loại: {{ $book->category ? $book->category->name : 'Chưa phân loại' }}
                     </p>
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-building me-2"></i>Nhà xuất bản: {{ $book->publisher->name }}
+                    </p>
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-info-circle me-2"></i>Thông tin phiên bản:
+                        <ul class="list-unstyled ms-4">
+                            <li>Phiên bản: {{ $latestEdition->edition_number }}</li>
+                            <li>Số trang: {{ $latestEdition->pages }}</li>
+                            <li>Kích thước: {{ $latestEdition->dimensions }}</li>
+                            <li>Định dạng: {{ $latestEdition->format }}</li>
+                            <li>ISBN: {{ $latestEdition->isbn }}</li>
+                            <li>Ngày xuất bản: {{ \Carbon\Carbon::parse($latestEdition->publication_date)->format('d/m/Y') }}</li>
+                        </ul>
+                    </p>
                     <div class="d-flex align-items-center mb-4">
-                        <h3 class="text-primary mb-0 me-3">{{ number_format($book->price) }}đ</h3>
-                        @if($book->quantity > 0)
-                            <span class="badge bg-success">Còn hàng</span>
+                        <h3 class="text-primary mb-0 me-3">{{ number_format($latestEdition->price) }}đ</h3>
+                        @if($latestEdition->quantity > 0)
+                            <span class="badge bg-success">Còn hàng ({{ $latestEdition->quantity }})</span>
                         @else
                             <span class="badge bg-danger">Hết hàng</span>
                         @endif
@@ -138,16 +152,17 @@
                         <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
                             @csrf
                             <input type="hidden" name="book_id" value="{{ $book->id }}">
+                            <input type="hidden" name="edition_id" value="{{ $latestEdition->id }}">
                             <div class="input-group me-3" style="width: 130px;">
                                 <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
                                     <i class="bi bi-dash"></i>
                                 </button>
-                                <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->quantity }}" id="quantity">
+                                <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $latestEdition->quantity }}" id="quantity">
                                 <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
                                     <i class="bi bi-plus"></i>
                                 </button>
                             </div>
-                            <button type="submit" class="btn btn-primary" {{ $book->quantity == 0 ? 'disabled' : '' }}>
+                            <button type="submit" class="btn btn-primary" {{ $latestEdition->quantity == 0 ? 'disabled' : '' }}>
                                 <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ
                             </button>
                         </form>
