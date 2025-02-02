@@ -107,7 +107,7 @@
                                          alt="{{ $book->title }}">
                                 </a>
                                 <div class="book-actions">
-                                    @if($book->quantity > 0)
+                                    @if($book->total_quantity > 0)
                                     <button class="btn btn-primary btn-sm" data-add-to-cart="{{ $book->id }}" data-book-title="{{ $book->title }}">
                                         <i class="bi bi-cart-plus"></i>
                                     </button>
@@ -122,7 +122,7 @@
                                         </span>
                                     </div>
                                     <div class="book-status">
-                                        @if($book->quantity > 0)
+                                        @if($book->total_quantity > 0)
                                             <span class="badge bg-success-subtle text-success">Còn hàng</span>
                                         @else
                                             <span class="badge bg-danger-subtle text-danger">Hết hàng</span>
@@ -134,31 +134,35 @@
                                         {{ $book->title }}
                                     </a>
                                 </h5>
-                                <p class="card-text text-muted mb-3">{{ $book->author }}</p>
+                                <p class="card-text text-muted mb-3">
+                                    @foreach($book->authors as $author)
+                                        {{ $author->name }}@if(!$loop->last), @endif
+                                    @endforeach
+                                </p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="price">
                                         <span class="text-muted small">Giá bán</span>
-                                        <div class="text-primary fw-bold">{{ number_format($book->price) }}đ</div>
+                                        <div class="text-primary fw-bold">{{ number_format($book->default_price) }}đ</div>
                                     </div>
-                                    @if($book->quantity > 0)
+                                    @if($book->total_quantity > 0)
                                     <div class="mb-4">
-                                <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
-                                    @csrf
-                                    <input type="hidden" name="book_id" value="{{ $book->id }}">
-                                    <div class="input-group me-3" style="width: 130px;">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
-                                            <i class="bi bi-dash"></i>
-                                        </button>
-                                        <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->quantity }}" id="quantity">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
-                                            <i class="bi bi-plus"></i>
-                                        </button>
+                                        <form action="{{ route('cart.add') }}" method="POST" class="d-flex align-items-center">
+                                            @csrf
+                                            <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                            <div class="input-group me-3" style="width: 130px;">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="decrementQuantity()">
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                                <input type="number" class="form-control text-center" name="quantity" value="1" min="1" max="{{ $book->total_quantity }}" id="quantity">
+                                                <button class="btn btn-outline-secondary" type="button" onclick="incrementQuantity()">
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                        </form>
                                     </div>
-                                    <button type="submit" class="btn btn-primary" {{ $book->quantity == 0 ? 'disabled' : '' }}>
-                                        <i class="bi bi-cart-plus"></i>
-                                    </button>
-                                </form>
-                            </div>
                                     @endif
                                 </div>
                             </div>

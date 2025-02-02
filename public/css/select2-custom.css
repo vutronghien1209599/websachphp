@@ -1,0 +1,113 @@
+/* Select2 Container */
+.select2-container--bootstrap-5 {
+    width: 100% !important;
+}
+
+/* Selection box */
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 38px;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #fff;
+}
+
+/* Multiple selections */
+.select2-container--bootstrap-5 .select2-selection--multiple {
+    padding: 3px 8px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-search__field {
+    margin: 5px 0;
+    padding: 0;
+    height: 25px;
+}
+
+/* Selected items */
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+    background-color: var(--primary-color);
+    border: none;
+    color: #fff;
+    padding: 2px 8px;
+    margin: 4px 4px;
+    border-radius: 3px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Remove button on selected items */
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
+    color: #fff;
+    margin-right: 5px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+    border-radius: 3px;
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+/* Dropdown */
+.select2-container--bootstrap-5 .select2-dropdown {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    margin-top: 2px;
+}
+
+/* Search box in dropdown */
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+}
+
+/* Options in dropdown */
+.select2-container--bootstrap-5 .select2-results__option {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+/* Add new button */
+.select2-add-new {
+    border-top: 1px solid #dee2e6;
+    margin-top: 0.5rem;
+    padding: 0.75rem !important;
+}
+
+.select2-add-new button {
+    transition: all 0.2s;
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.select2-add-new button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus state */
+.select2-container--bootstrap-5.select2-container--focus .select2-selection {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Error state */
+.is-invalid + .select2-container--bootstrap-5 .select2-selection {
+    border-color: #dc3545;
+}
+
+.is-invalid + .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+} 

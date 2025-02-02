@@ -1,0 +1,41 @@
+/* Rating stars */
+.rating-stars {
+    margin-bottom: 1rem;
+}
+
+.rating-stars input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.rating-stars label {
+    cursor: pointer;
+    padding: 0 0.2rem;
+    font-size: 1.5rem;
+    color: #ddd;
+}
+
+.rating-stars label:hover,
+.rating-stars label:hover ~ label,
+.rating-stars input[type="radio"]:checked ~ label {
+    color: #ffc107;
+    transition: all 0.2s;
+}
+
+.rating-stars .d-flex {
+    gap: 0.5rem;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+} 

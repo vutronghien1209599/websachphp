@@ -44,4 +44,14 @@ class User extends Authenticatable
     {
         return $this->role === 'admin';
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
+    }
 }

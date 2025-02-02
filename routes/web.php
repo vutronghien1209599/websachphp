@@ -17,6 +17,11 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DiscountController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AuthorController;
+use App\Http\Controllers\Admin\PublisherController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\ChatController;
 
 // Route cho khách
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -70,6 +75,17 @@ Route::middleware('auth')->group(function () {
     // Thông tin cá nhân
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Reviews
+    Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('/reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
+
+    // Chat routes
+    Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
+    Route::post('/chats', [ChatController::class, 'store'])->name('chats.store');
+    Route::post('/chats/mark-as-read', [ChatController::class, 'markAsRead'])->name('chats.mark-as-read');
 });
 
 // Route cho admin
@@ -115,4 +131,32 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Quản lý voucher
     Route::resource('discounts', DiscountController::class);
+
+    // Authors
+    Route::resource('authors', AuthorController::class);
+
+    // Quản lý nhà xuất bản
+    Route::resource('publishers', PublisherController::class);
+
+    // Quản lý reviews
+    Route::get('reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('reviews/{review}', [App\Http\Controllers\Admin\ReviewController::class, 'show'])->name('reviews.show');
+    Route::post('reviews/{review}/approve', [App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('reviews/{review}/reject', [App\Http\Controllers\Admin\ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::post('reviews/{review}/respond', [App\Http\Controllers\Admin\ReviewController::class, 'respond'])->name('reviews.respond');
+    Route::delete('reviews/responses/{response}', [App\Http\Controllers\Admin\ReviewController::class, 'deleteResponse'])->name('reviews.responses.delete');
+    Route::delete('reviews/{review}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
+});
+
+// Frontend routes
+Route::get('authors', [\App\Http\Controllers\Admin\AuthorController::class, 'index'])->name('authors.index');
+Route::get('authors/{author:slug}', [\App\Http\Controllers\Admin\AuthorController::class, 'show'])->name('authors.show');
+
+Route::get('publishers', [PublisherController::class, 'index'])->name('publishers.index');
+Route::get('publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');
+
+// API routes for select2
+Route::prefix('api')->name('api.')->middleware(['auth'])->group(function () {
+    Route::get('authors/search', [App\Http\Controllers\Admin\AuthorController::class, 'search'])->name('authors.search');
+    Route::post('authors', [App\Http\Controllers\Admin\AuthorController::class, 'apiStore'])->name('authors.store');
 });

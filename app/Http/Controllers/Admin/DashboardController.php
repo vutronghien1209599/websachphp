@@ -43,7 +43,7 @@ class DashboardController extends Controller
                 DB::raw('COALESCE(SUM(order_items.quantity), 0) as total_sold'),
                 DB::raw('COALESCE(SUM(order_items.quantity * order_items.price), 0) as revenue')
             )
-            ->groupBy('books.id', 'books.title', 'books.author', 'books.price', 'books.image', 'books.description', 'books.created_at', 'books.updated_at')
+            ->groupBy('books.id', 'books.title', 'books.slug', 'books.description', 'books.category_id', 'books.publisher_id', 'books.original_language', 'books.image', 'books.status', 'books.created_at', 'books.updated_at')
             ->orderByDesc('total_sold')
             ->limit(5)
             ->get();

@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - Quản trị Book Store</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Quản trị') - {{ config('app.name') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4e73df;
@@ -86,6 +89,7 @@
             border-radius: .35rem;
         }
     </style>
+    @stack('styles')
 </head>
 <body>
     <div class="container-fluid">
@@ -104,7 +108,20 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.books.*') ? 'active' : '' }}" href="{{ route('admin.books.index') }}">
-                                <i class="bi bi-book"></i> Quản lý sách
+                                <i class="bi bi-book"></i>
+                                <span>Quản lý sách</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.authors.*') ? 'active' : '' }}" href="{{ route('admin.authors.index') }}">
+                                <i class="bi bi-person-lines-fill"></i>
+                                <span>Quản lý tác giả</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.publishers.*') ? 'active' : '' }}" href="{{ route('admin.publishers.index') }}">
+                                <i class="bi bi-building"></i>
+                                <span>Quản lý nhà xuất bản</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -118,8 +135,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.categories.index') }}">
-                                <i class="bi bi-list"></i>
+                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">
+                                <i class="bi bi-grid"></i>
                                 <span>Quản lý danh mục</span>
                             </a>
                         </li>
@@ -127,6 +144,13 @@
                             <a class="nav-link" href="{{ route('admin.discounts.index') }}">
                                 <i class="bi bi-ticket-perforated"></i>
                                 <span>Quản lý voucher</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.reviews.index') }}">
+                                <i class="bi bi-star"></i>
+                                <span>Quản lý đánh giá</span>
                             </a>
                         </li>
                         <li class="nav-item mt-3">
@@ -192,8 +216,43 @@
         </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+    // Cấu hình mặc định cho toastr
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+
+    // Hiển thị thông báo từ session flash
+    @if(session('success'))
+        toastr.success('{{ session('success') }}');
+    @endif
+
+    @if(session('error'))
+        toastr.error('{{ session('error') }}');
+    @endif
+    </script>
+
     @stack('scripts')
 </body>
 </html> 

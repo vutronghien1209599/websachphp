@@ -64,15 +64,19 @@
                                          alt="{{ $book->title }}" style="width: 50px;">
                                 </td>
                                 <td>{{ $book->title }}</td>
-                                <td>{{ $book->author }}</td>
-                                <td>{{ $book->category->name }}</td>
-                                <td>{{ number_format($book->price) }}đ</td>
-                                <td>{{ $book->quantity }}</td>
                                 <td>
-                                    @if($book->status === 'available')
-                                        <span class="badge bg-success">Còn hàng</span>
+                                    @foreach($book->authors as $author)
+                                        {{ $author->name }}@if(!$loop->last), @endif
+                                    @endforeach
+                                </td>
+                                <td>{{ $book->category->name }}</td>
+                                <td>{{ number_format($book->default_price) }}đ</td>
+                                <td>{{ $book->total_quantity }}</td>
+                                <td>
+                                    @if($book->status === 'active')
+                                        <span class="badge bg-success">Hoạt động</span>
                                     @else
-                                        <span class="badge bg-danger">Hết hàng</span>
+                                        <span class="badge bg-danger">Không hoạt động</span>
                                     @endif
                                 </td>
                                 <td>

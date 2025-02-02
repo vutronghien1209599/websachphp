@@ -13,10 +13,13 @@ class BookController extends Controller
         $query = Book::query();
 
         // Xử lý tìm kiếm
-        // Nếu có từ khóa tìm kiếm thì tìm kiếm theo title và author
         if ($search = $request->input('search')) {
-            $query->where('title', 'like', "%{$search}%")
-                  ->orWhere('author', 'like', "%{$search}%");
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhereHas('authors', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
         }
 
         // Xử lý lọc theo danh mục
@@ -29,10 +32,10 @@ class BookController extends Controller
         // Xử lý sắp xếp
         switch ($request->input('sort')) {
             case 'price_asc':
-                $query->orderBy('price', 'asc');
+                $query->orderBy('default_price', 'asc');
                 break;
             case 'price_desc':
-                $query->orderBy('price', 'desc');
+                $query->orderBy('default_price', 'desc');
                 break;
             default:
                 $query->latest();
@@ -40,7 +43,7 @@ class BookController extends Controller
         }
 
         // Phân trang với 12 item mỗi trang
-        $books = $query->with('category')->paginate(12);
+        $books = $query->with(['category', 'authors', 'editions'])->paginate(12);
         $categories = Category::all();
 
         return view('books.index', compact('books', 'categories'));
@@ -48,9 +51,13 @@ class BookController extends Controller
 
     public function show(Book $book)
     {
+        // Load các quan hệ cần thiết
+        $book->load(['category', 'authors', 'editions', 'publisher']);
+        
         // Lấy các sách liên quan cùng thể loại
         $relatedBooks = Book::where('category_id', $book->category_id)
             ->where('id', '!=', $book->id)
+            ->with(['authors', 'editions'])
             ->take(4)
             ->get();
 
@@ -62,11 +69,12 @@ class BookController extends Controller
         // Lấy thể loại theo slug
         $category = Category::where('slug', $slug)->firstOrFail();
         // Lấy các sách thuộc thể loại đó
-        $books = Book::where('category_id', $category->id)->paginate(12);
+        $books = Book::where('category_id', $category->id)
+            ->with(['authors', 'editions'])
+            ->paginate(12);
         // Lấy danh sách tất cả các thể loại
         $categories = Category::all();
 
-        // Trả ra giao diện books.index với các biến truyền vào
         return view('books.index', compact('books', 'categories'));
     }
 } 
