@@ -72,7 +72,7 @@
                             </div>
                             <div class="book-status">
                                 @php
-                                    $latestEdition = $book->bookEditions->first();
+                                    $latestEdition = $book->editions->first();
                                 @endphp
                                 @if($latestEdition && $latestEdition->quantity > 0)
                                     <span class="badge bg-success-subtle text-success">Còn hàng ({{ $latestEdition->quantity }})</span>
@@ -157,7 +157,7 @@
                             </div>
                             <div class="book-status">
                                 @php
-                                    $latestEdition = $book->bookEditions->first();
+                                    $latestEdition = $book->editions->first();
                                 @endphp
                                 @if($latestEdition && $latestEdition->quantity > 0)
                                     <span class="badge bg-success-subtle text-success">Còn hàng ({{ $latestEdition->quantity }})</span>
