@@ -15,7 +15,7 @@ class HomeController extends Controller
         
         // Lấy sách mới với phiên bản mới nhất
         $newBooks = Book::where('status', 'active')
-            ->with(['category', 'authors', 'editions' => function($q) {
+            ->with(['category', 'authors', 'bookEditions' => function($q) {
                 $q->latest('publication_date');
             }])
             ->latest()
@@ -25,7 +25,7 @@ class HomeController extends Controller
         // Lấy sách bán chạy với phiên bản mới nhất
         $bestSellers = Book::where('status', 'active')
             ->withCount('orderItems')
-            ->with(['category', 'authors', 'editions' => function($q) {
+            ->with(['category', 'authors', 'bookEditions' => function($q) {
                 $q->latest('publication_date');
             }])
             ->orderByDesc('order_items_count')

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\BookEdition;
 use App\Models\CartItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -11,11 +12,11 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cartItems = auth()->user()->cart()->with('book')->get();
+        $cartItems = auth()->user()->cart()->with(['book', 'bookEdition'])->get();
         
         // Tính tổng tiền trước khi giảm giá
         $subtotal = $cartItems->sum(function ($item) {
-            return $item->book->price * $item->quantity;
+            return $item->bookEdition->price * $item->quantity;
         });
 
         // Xử lý giảm giá
@@ -32,13 +33,15 @@ class CartController extends Controller
         // Validate dữ liệu được gửi từ form
         $validated = $request->validate([
             'book_id' => 'required|exists:books,id',
-            'edition_id' => 'required|exists:editions,id',
+            'edition_id' => 'required|exists:book_editions,id',
             'quantity' => 'required|integer|min:1'
         ]);
 
         // Lấy sách và phiên bản theo id
         $book = Book::findOrFail($validated['book_id']);
-        $edition = $book->editions()->findOrFail($validated['edition_id']);
+        $edition = BookEdition::where('book_id', $book->id)
+            ->where('id', $validated['edition_id'])
+            ->firstOrFail();
 
         // Kiểm tra số lượng tồn kho của phiên bản
         if ($edition->quantity < $validated['quantity']) {
@@ -85,7 +88,7 @@ class CartController extends Controller
         ]);
 
         // Kiểm tra số lượng tồn kho của phiên bản
-        $edition = $cartItem->edition;
+        $edition = $cartItem->bookEdition;
         if ($edition->quantity < $validated['quantity']) {
             return back()->with('error', 'Số lượng sách trong kho không đủ');
         }

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Edition;
+use App\Models\BookEdition;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,8 +27,8 @@ class CartItem extends Model
         return $this->belongsTo(Book::class);
     }
 
-    public function edition()
+    public function bookEdition()
     {
-        return $this->belongsTo(Edition::class);
+        return $this->belongsTo(BookEdition::class, 'edition_id');
     }
 } 
